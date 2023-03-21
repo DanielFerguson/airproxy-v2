@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /app
+Disallow: /cdn-cgi* 
+Sitemap: https://www.airproxy.app/sitemap.xml
