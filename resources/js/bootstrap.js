@@ -9,6 +9,12 @@ window.axios = axios;
 
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
+import vapor from "laravel-vapor";
+
+window.Vapor = vapor;
+
+Vapor.withBaseAssetUrl(import.meta.env.VITE_VAPOR_ASSET_URL);
+
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting

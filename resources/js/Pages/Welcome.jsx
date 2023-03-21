@@ -234,7 +234,7 @@ export default function Welcome(props) {
                                 <Link href="#" className="-m-1.5 p-1.5">
                                     <span className="sr-only">Airproxy</span>
                                     <img
-                                        src="/cloud.png"
+                                        src={Vapor.asset("cloud.png")}
                                         alt="Airproxy"
                                         className="h-16 w-16"
                                     />
@@ -297,7 +297,7 @@ export default function Welcome(props) {
                                                 Airproxy
                                             </span>
                                             <img
-                                                src="/cloud.png"
+                                                src={Vapor.asset("cloud.png")}
                                                 alt="Airproxy"
                                                 className="h-16 w-16"
                                             />
@@ -571,7 +571,7 @@ export default function Welcome(props) {
                 <div className="relative">
                     <img
                         className="mx-auto h-8"
-                        src="/icons/iw-color.svg"
+                        src={Vapor.asset("icons/iw-color.svg")}
                         alt="Imperial Wealth"
                     />
                     <blockquote className="mt-10">
@@ -592,7 +592,7 @@ export default function Welcome(props) {
                                 <div className="md:flex-shrink-0">
                                     <img
                                         className="mx-auto h-10 w-10 rounded-full"
-                                        src="/pugh.jpeg"
+                                        src={Vapor.asset("pugh.jpeg")}
                                         alt="Daniel Pugh, COO of Imperial Wealth"
                                     />
                                 </div>

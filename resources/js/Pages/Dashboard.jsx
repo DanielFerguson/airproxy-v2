@@ -70,7 +70,9 @@ export default function Dashboard({ auth, errors, bases, stats }) {
                             <Text className="truncate">
                                 /{" "}
                                 {millify(
-                                    auth.plan.options.max_monthly_requests
+                                    auth.plan
+                                        ? auth.plan.options.max_monthly_requests
+                                        : 0
                                 )}
                             </Text>
                         </Flex>
@@ -92,7 +94,10 @@ export default function Dashboard({ auth, errors, bases, stats }) {
                             <Text className="truncate">
                                 /{" "}
                                 {millify(
-                                    auth.plan.options.max_monthly_unique_users
+                                    auth.plan
+                                        ? auth.plan.options
+                                              .max_monthly_unique_users
+                                        : 0
                                 )}
                             </Text>
                         </Flex>
