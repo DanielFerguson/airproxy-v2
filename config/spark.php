@@ -196,6 +196,8 @@ return [
                         "TypeScript definition generation",
                         "API protection",
                         "Image CDN",
+                        "99.99% uptime SLA",
+                        "Priority support",
                     ],
                     'options' => [
                         'max_monthly_unique_users' => 40_000,

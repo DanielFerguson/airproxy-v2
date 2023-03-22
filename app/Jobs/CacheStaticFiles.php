@@ -18,6 +18,7 @@ class CacheStaticFiles implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
+        private readonly string $user_id,
         private readonly array $data
     ) {
     }
@@ -40,12 +41,15 @@ class CacheStaticFiles implements ShouldQueue
                 foreach ($v as $k => $v) {
                     if (gettype($v) !== 'object') continue;
 
-                    ray($v, gettype($v));
-
                     // Check whether the record has id, filename and url
                     if (!isset($v->id) || !isset($v->filename) || !isset($v->url)) continue;
 
-                    DownloadAndStoreFile::dispatch(url: $v->url, id: $v->id);
+                    DownloadAndStoreFile::dispatch(
+                        user_id: $this->user_id,
+                        url: $v->url,
+                        id: $v->id,
+                        filename: $v->filename,
+                    );
                 }
             }
         }

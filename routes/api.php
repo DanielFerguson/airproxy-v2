@@ -2,13 +2,12 @@
 
 use App\Http\Controllers\AirtableController;
 use App\Jobs\CacheStaticFiles;
-use App\Models\Base;
-use App\Models\Table;
-use App\Models\View;
+use App\Jobs\StoreRequestRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Database\Query\Builder;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,37 +20,41 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+const ONE_HOUR_IN_SECONDS = 60 * 60;
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 Route::prefix('v1')->group(function () {
+    // TODO: Record the request
     Route::get('/asset/{asset_id}', function ($asset_id) {
-        // TODO: Record the request
-
         // Serve the static file
-        return response()->file(storage_path("app/{$asset_id}"));
+        return null;
     });
 
+    // TODO: Add filter - available to Team+, allows for simple single filter
+    // TODO: Add formula - available to Enterprise, allows the user to pass in a formula
     // TODO: Add sortBy
-    // TODO: Add filter
+    // TODO: Add ability to eager load relationships?
     Route::get('/{base_id}/{table_id}/{view_id?}', function (Request $request, string $base_id, string $table_id, string|null $view_id = null) {
         $page = $request->query('page', '1');
         $per_page = $request->query('perPage', '100');
 
         if (intval($page) < 1) {
             return response()->json([
-                'error' => 'The page number must be positive',
+                'error' => 'Page must be positive.',
             ], 400);
         }
 
         if (intval($per_page) < 1 || intval($per_page) > 100) {
             return response()->json([
-                'error' => 'The per_page number must be between 1 and 100',
+                'error' => 'perPage must be between 1 and 100.',
             ], 400);
         }
 
-        DB::table('requests')->insert([
+        StoreRequestRecord::dispatchAfterResponse([
+            'created_at' => now(),
             'base_id' => $base_id,
             'table_id' => $table_id,
             'view_id' => $view_id,
@@ -61,71 +64,86 @@ Route::prefix('v1')->group(function () {
             'user_agent' => $request->userAgent(),
             'referrer' => $request->header('Referer'),
             'headers' => json_encode($request->headers->all()),
-            'city' => $request->header('cf-ipcity'),
             'country' => $request->header('cf-ipcountry'),
-            'continent' => $request->header('cf-ipcontinent'),
-            'latitude' => $request->header('cf-iplatitude'),
-            'longitude' => $request->header('cf-iplongitude'),
         ]);
 
-        $checks = DB::table('bases')
-            ->select(DB::raw('bases.is_active AS base_is_active, tables.is_active AS table_is_active, api_tokens.value AS token, secret, tables.ttl'))
-            ->leftJoin('tables', 'tables.base_id', '=', 'bases.id')
-            ->leftJoin('api_tokens', 'api_tokens.id', '=', 'bases.api_token_id')
-            ->where('bases.id', '=', $base_id)
-            ->where('tables.id', '=', $table_id)
-            ->first();
+        $check_key = "check-base:{$base_id}:table:{$table_id}:view:{$view_id}";
 
-        // Check that the base and table are active
-        if (!$checks->base_is_active || !$checks->table_is_active) {
+        // Check that the base, table, and view exists, and that the base and table are active
+        $check = Cache::tags(['check'])->remember(
+            $check_key,
+            ONE_HOUR_IN_SECONDS,
+            fn () => DB::table('bases')
+                ->select(
+                    'bases.is_active AS base_is_active,',
+                    'tables.is_active AS table_is_active',
+                    'api_tokens.value AS token',
+                    'bases.secret',
+                    'tables.ttl'
+                )
+                ->leftJoin('tables', 'tables.base_id', '=', 'bases.id')
+                ->leftJoin('api_tokens', 'api_tokens.id', '=', 'bases.api_token_id')
+                ->where('bases.id', $base_id)
+                ->where('tables.id', $table_id)
+                ->when($view_id, function (Builder $query, string $view_id) {
+                    $query
+                        ->addSelect('views.is_active as view_is_active')
+                        ->leftJoin('views', 'views.table_id', '=', 'tables.id')
+                        ->where('views.id', $view_id);
+                }, function (Builder $query) {
+                    $query->selectRaw('NULL as view_is_active');
+                })
+                ->first()
+        );
+
+        // If the base, table, or view does not exist, return a 404
+        if (is_null($check)) {
             return response()->json([
-                'error' => 'The base or table is not active',
+                'error' => $view_id
+                    ? 'The base, table, or view does not exist'
+                    : 'The base or table does not exist',
+            ], 404);
+        }
+
+        // Destructure $results
+        [$base_is_active, $table_is_active, $token, $secret, $ttl, $view_is_active] = array_values((array) $check);
+
+        // If the base, table or view is not active, return a 404
+        if (!$base_is_active || !$table_is_active || ($view_id && !$view_is_active)) {
+            return response()->json([
+                'error' => $view_id
+                    ? 'The base, table, or view is not active'
+                    : 'The base or table is not active',
             ], 404);
         }
 
         // If the base has a secret, check that the header has been passed through and matches
-        if (isset($checks->secret) && $checks->secret !== $request->header('Authorization')) {
+        if (isset($secret) && $secret !== $request->header('Authorization')) {
             return response()->json([
                 'error' => 'The Authorization header is invalid',
             ], 401);
         }
 
+        // TODO: Add formula, filter, and sort to the cache key
         $cache_key = "data-base:{$base_id}:table:{$table_id}:view:{$view_id}:page:{$page}:per_page:{$per_page}";
 
-        // Check whether the data exists in the cache and return it if it does
+        // If the data exists in the cache, return it
         if (Cache::has($cache_key)) {
             return response()->json(Cache::get($cache_key));
         }
 
-        // Else, fetch the data from Airtable
-        $airtable = new AirtableController($checks->token);
-
-        // Check that the base, table and view exists
-        if (Base::where('id', '=', $base_id)->doesntExist()) {
-            return response()->json([
-                'error' => 'The base does not exist',
-            ], 404);
-        }
-
-        if (Table::where('id', '=', $table_id)->doesntExist()) {
-            return response()->json([
-                'error' => 'The table does not exist',
-            ], 404);
-        }
-
-        if ($view_id && View::where('id', '=', $view_id)->doesntExist()) {
-            return response()->json([
-                'error' => 'The view does not exist',
-            ], 404);
-        }
-
+        // Fetch the data from Airtable
+        $airtable = new AirtableController($token);
         $data = $airtable->getRecords($base_id, $table_id, $view_id, $page, $per_page);
 
-        // Cache the response for the base's TTL and return the response
-        Cache::put($cache_key, $data, Base::where('id', '=', $base_id)->first()->ttl);
+        // Cache the data for the base's TTL
+        Cache::tags(["data", "base:$base_id", "table:$table_id", "view:$view_id"])->put($cache_key, $data, $ttl);
 
         // Fire off a job to fetch and cache all of the static files
-        CacheStaticFiles::dispatch($data);
+        CacheStaticFiles::dispatchAfterResponse(
+            user_id: $request->user()->id,
+            data: $data
+        );
 
         return response()->json($data);
     });

@@ -9,58 +9,18 @@ use Illuminate\Auth\Access\Response;
 class BasePolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Determine whether the user can bust the cache for the base.
      */
-    public function viewAny(User $user): bool
+    public function bustCache(User $user, Base $base): bool
     {
-        //
+        return $user->id === $base->user_id;
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Determine whether the user can disable the base.
      */
-    public function view(User $user, Base $base): bool
+    public function disable(User $user, Base $base): bool
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, Base $base): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Base $base): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, Base $base): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Base $base): bool
-    {
-        //
+        return $user->id === $base->user_id;
     }
 }

@@ -2,65 +2,69 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreBaseRequest;
-use App\Http\Requests\UpdateBaseRequest;
 use App\Models\Base;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class BaseController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreBaseRequest $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show(Base $base)
     {
-        //
+        $result = DB::select(
+            "SELECT
+                COUNT(*) AS total_requests
+                COUNT(DISTINCT ip_address) AS unique_users
+            FROM
+                requests
+            WHERE
+                base_id = :base_id AND
+                created_at > DATE_SUB(NOW(), INTERVAL 30 DAY);",
+            ['base_id' => $base->id]
+        )[0];
+
+        return Inertia::render('Base', [
+            'base' => $base->load('tables'),
+            'stats' => [
+                'total_requests' => $result->total_requests,
+                'unique_users' => $result->unique_users,
+            ],
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Base $base)
+    public function bustCache(Request $request, Base $base): RedirectResponse
     {
-        //
+        // Check whether the user can bust this cache (if the base belongs to them)
+        if ($request->user()->cannot('bustCache', $base)) {
+            abort(403);
+        }
+
+        // Bust the cache
+        Cache::tags(["base:$base->id"])->flush();
+
+        // TODO: Return a success message to trigger a toast
+        return to_route('base', $base);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateBaseRequest $request, Base $base)
+    public function disable(Request $request, Base $base): RedirectResponse
     {
-        //
-    }
+        // Check whether the user can disable this base (if the base belongs to them)
+        if ($request->user()->cannot('disable', $base)) {
+            abort(403);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Base $base)
-    {
-        //
+        // Disable the base
+        $base->update(['is_active' => false]);
+
+        // Bust the cache
+        Cache::tags(["base:$base->id"])->flush();
+
+        // TODO: Return a success message to trigger a toast
+        return to_route('base', $base);
     }
 }

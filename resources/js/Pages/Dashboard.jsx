@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import millify from "millify";
 import { PauseIcon, PlayIcon, ArrowPathIcon } from "@heroicons/react/20/solid";
 import {
@@ -103,6 +103,7 @@ export default function Dashboard({ auth, errors, bases, stats }) {
                         </Flex>
                     </Card>
                 </Grid>
+                {/* TODO: When I've done everything else. */}
                 {/* Requests Charts */}
                 {/* <Card className="mt-6">
                     <Title>Requests</Title>
@@ -132,22 +133,8 @@ export default function Dashboard({ auth, errors, bases, stats }) {
                 </Card> */}
                 {/* Bases */}
                 <Card className="mt-6">
-                    <Flex>
-                        <div>
-                            <Title>Bases</Title>
-                            <Text>
-                                A list of all the bases, and their controls.
-                            </Text>
-                        </div>
-                        <Flex className="space-x-4 justify-end items-end">
-                            <Button icon={ArrowPathIcon} color="indigo">
-                                Refresh list
-                            </Button>
-                            <Button icon={PauseCircleIcon} color="indigo">
-                                Disable all
-                            </Button>
-                        </Flex>
-                    </Flex>
+                    <Title>Bases</Title>
+                    <Text>A list of all the bases, and their controls.</Text>
                     <Table className="mt-5">
                         <TableHead>
                             <TableRow>
@@ -155,9 +142,6 @@ export default function Dashboard({ auth, errors, bases, stats }) {
                                 <TableHeaderCell>Status</TableHeaderCell>
                                 <TableHeaderCell>Access</TableHeaderCell>
                                 <TableHeaderCell>Tables</TableHeaderCell>
-                                <TableHeaderCell>
-                                    <span className="sr-only">Actions</span>
-                                </TableHeaderCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -210,35 +194,7 @@ export default function Dashboard({ auth, errors, bases, stats }) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        {/* TODO */}
                                         <Text>{base.tables.length} tables</Text>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Flex>
-                                            <Button
-                                                icon={ArrowPathIcon}
-                                                size="xs"
-                                                variant="light"
-                                                color="indigo"
-                                            ></Button>
-                                            <Button
-                                                icon={
-                                                    base.is_active
-                                                        ? PauseIcon
-                                                        : PlayIcon
-                                                }
-                                                variant="light"
-                                                size="xs"
-                                                color="indigo"
-                                            />
-                                            <Button
-                                                disabled={!base.secret}
-                                                variant="light"
-                                                icon={KeyIcon}
-                                                size="xs"
-                                                color="indigo"
-                                            />
-                                        </Flex>
                                     </TableCell>
                                 </TableRow>
                             ))}

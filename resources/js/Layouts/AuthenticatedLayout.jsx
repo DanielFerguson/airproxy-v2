@@ -50,7 +50,7 @@ export default function Authenticated({ auth, header, children }) {
                                                 active ? "bg-gray-100" : ""
                                             }`}
                                         >
-                                            Dashboard
+                                            Home
                                         </Link>
                                     )}
                                 </Menu.Item>
@@ -66,7 +66,7 @@ export default function Authenticated({ auth, header, children }) {
                                         </Link>
                                     )}
                                 </Menu.Item>
-                                {/* <Menu.Item>
+                                <Menu.Item>
                                     {({ active }) => (
                                         <Link
                                             href="/docs"
@@ -75,10 +75,10 @@ export default function Authenticated({ auth, header, children }) {
                                                 active ? "bg-gray-100" : ""
                                             }`}
                                         >
-                                            Docs
+                                            Documentation
                                         </Link>
                                     )}
-                                </Menu.Item> */}
+                                </Menu.Item>
                                 <Menu.Item>
                                     {({ active }) => (
                                         <Link

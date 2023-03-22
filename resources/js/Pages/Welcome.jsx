@@ -18,10 +18,6 @@ import {
     PhotoIcon,
 } from "@heroicons/react/24/outline";
 
-function classNames(...classes) {
-    return classes.filter().join(" ");
-}
-
 function isDiscountPeriod() {
     const today = new Date();
     const discountStart = new Date("2022-01-01");
@@ -78,49 +74,49 @@ const features = [
         description:
             "Share schemas with your developers, generate test data, and get TypeScript types to build your UIs safely.",
         icon: UsersIcon,
-        comingSoon: "Q1 2023",
-    },
-    {
-        name: "Dark Mode",
-        description:
-            "Doing some late night coding? No longer will you need to burn out your retinas.",
-        icon: MoonIcon,
-        comingSoon: "Q1 2023",
+        comingSoon: "Q2 2023",
     },
     {
         name: "Type Generator",
         description:
             "Generate TypeScript types and interfaces from your Airtable schemas.",
         icon: BeakerIcon,
-        comingSoon: "Q1 2023",
+        comingSoon: "Q2 2023",
     },
     {
         name: "Private CDNs",
         description:
             "Protect your static assets with private CDNs, secured with API keys.",
         icon: LockClosedIcon,
-        comingSoon: "Q1 2023",
+        comingSoon: "Q2 2023",
     },
     {
         name: "Image Optimisations",
         description:
             "Compress, resize, and optimise your images on the fly with our CDN.",
         icon: PhotoIcon,
-        comingSoon: "Q1 2023",
+        comingSoon: "Q2 2023",
     },
     {
-        name: "Typesafe APIs",
+        name: "Dark Mode",
         description:
-            "Move faster with type-safe APIs that are generated from your Airtable schemas.",
-        icon: ShieldCheckIcon,
-        comingSoon: "Q2 2023",
+            "Doing some late night coding? No longer will you need to burn out your retinas.",
+        icon: MoonIcon,
+        comingSoon: "Q3 2023",
     },
     {
         name: "Webhooks",
         description:
             "Get notified when your data changes with webhooks, and power your user interfaces in real time.",
         icon: SignalIcon,
-        comingSoon: "Q2 2023",
+        comingSoon: "Q3 2023",
+    },
+    {
+        name: "Typesafe APIs",
+        description:
+            "Move faster with type-safe APIs that are generated from your Airtable schemas.",
+        icon: ShieldCheckIcon,
+        comingSoon: "Q4 2023",
     },
 ];
 
@@ -175,6 +171,8 @@ const pricing = {
                 "TypeScript definition generation",
                 "API protection",
                 "Image CDN",
+                "99.99% uptime SLA",
+                "Priority support",
             ],
             link: "https://airproxy.lemonsqueezy.com/checkout/buy/020e0597-77f7-4336-8fd7-fbeaf08768ae?embed=1",
             mostPopular: false,
@@ -266,7 +264,7 @@ export default function Welcome(props) {
                                     </Link>
                                 ))}
                             </div>
-                            <div className="hidden lg:flex lg:min-w-0 lg:flex-1 lg:justify-end">
+                            <div className="hidden lg:flex lg:min-w-0 lg:flex-1 lg:justify-end space-x-3">
                                 {props.auth.user ? (
                                     <Link
                                         href={route("dashboard")}
@@ -275,12 +273,20 @@ export default function Welcome(props) {
                                         Dashboard
                                     </Link>
                                 ) : (
-                                    <Link
-                                        href={route("login")}
-                                        className="inline-block rounded-lg px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 shadow-sm ring-1 ring-gray-900/10 hover:ring-gray-900/20"
-                                    >
-                                        Log in
-                                    </Link>
+                                    <>
+                                        <Link
+                                            href={route("register")}
+                                            className="inline-block rounded-lg px-3 py-1.5 text-sm leading-6 text-gray-900"
+                                        >
+                                            Register
+                                        </Link>
+                                        <Link
+                                            href={route("login")}
+                                            className="inline-block rounded-lg px-3 py-1.5 text-sm font-semibold leading-6 text-gray-900 shadow-sm ring-1 ring-gray-900/10 hover:ring-gray-900/20"
+                                        >
+                                            Log in
+                                        </Link>
+                                    </>
                                 )}
                             </div>
                         </nav>

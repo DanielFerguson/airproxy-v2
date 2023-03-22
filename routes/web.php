@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\BaseController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,34 +29,38 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-        $bases = auth()->user()->bases()->with('tables')->get();
+        $user_id = auth()->user()->id;
 
-        // TODO
-        $stats = [
-            'total_requests' => 0,
-            'unique_users' => 0,
-        ];
+        $result = DB::select(
+            "SELECT
+                COUNT(*) AS total_requests,
+                COUNT(DISTINCT ip_address) AS unique_users
+            FROM
+                requests
+            WHERE
+                base_id IN(
+                    SELECT
+                        id FROM bases
+                    WHERE
+                        user_id = :user_id) AND
+                created_at > DATE_SUB(NOW(), INTERVAL 30 DAY);",
+            ['user_id' => $user_id]
+        )[0];
 
         return Inertia::render('Dashboard', [
-            'bases' => $bases,
-            'stats' => $stats,
+            'bases' => auth()->user()->bases()->with('tables')->get(),
+            'stats' => [
+                'total_requests' => $result->total_requests,
+                'unique_users' => $result->unique_users,
+            ],
         ]);
     })->name('dashboard');
 
-    Route::get('/bases/{base_id}', function ($base_id) {
-        $base = auth()->user()->bases()->with('tables')->findOrFail($base_id);
-
-        // TODO
-        $stats = [
-            'total_requests' => 0,
-            'unique_users' => 0,
-        ];
-
-        return Inertia::render('Base', [
-            'base' => $base,
-            'stats' => $stats,
-        ]);
-    })->name('base');
+    Route::controller(BaseController::class)->group(function () {
+        Route::get('/bases/{base}', 'show')->name('base');
+        Route::post('/bases/{base}/disable', 'disable')->name('base.disable');
+        Route::post('/bases/{base}/bust-cache', 'bustCache')->name('base.bust-cache');
+    });
 });
 
 

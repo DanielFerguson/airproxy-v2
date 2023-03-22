@@ -14,13 +14,18 @@ class DownloadAndStoreFile implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private readonly string $path;
+
     /**
      * Create a new job instance.
      */
     public function __construct(
+        string $user_id,
         private readonly string $url,
-        private readonly string $id,
+        string $id,
+        string $filename,
     ) {
+        $this->path = "$user_id/$id-$filename";
     }
 
     /**
@@ -29,17 +34,18 @@ class DownloadAndStoreFile implements ShouldQueue
     public function handle(): void
     {
         // Check if the file already exists
-        if (Storage::exists($this->id)) {
+        if (Storage::exists($this->path)) {
             return;
         }
 
         // Download the file
         $file = file_get_contents($this->url);
 
+        // If the file is empty, return
         if ($file === false) {
             return;
         }
 
-        Storage::put($this->id, $file);
+        Storage::put($this->path, $file);
     }
 }

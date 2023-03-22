@@ -20,12 +20,8 @@ class Request extends Model
         'referrer',
         'headers',
         'asn',
-        'continent',
         'country',
         'region',
-        'city',
-        'latitude',
-        'longitude',
     ];
 
     public function table()

@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head } from "@inertiajs/react";
+import { Head, Link } from "@inertiajs/react";
 import millify from "millify";
 import { PauseIcon, ArrowPathIcon } from "@heroicons/react/20/solid";
 import {
@@ -26,7 +26,7 @@ import {
     Badge,
 } from "@tremor/react";
 
-export default function Dashboard({ auth, errors, base, stats }) {
+export default function Dashboard({ auth, errors, base, stats, message }) {
     return (
         <AuthenticatedLayout
             auth={auth}
@@ -40,12 +40,31 @@ export default function Dashboard({ auth, errors, base, stats }) {
             <Head title="Dashboard" />
             <Toaster />
 
+            {JSON.stringify(message)}
+
             {/* Bases */}
             <div className="mx-auto max-w-3xl px-4 pb-24 sm:mt-8">
-                <Title>{base.name}</Title>
-                <Text>
-                    Interact with tables, and stats over the last 30 days.
-                </Text>
+                <Flex>
+                    <div>
+                        <Title>{base.name}</Title>
+                        <Text>
+                            Interact with tables, and stats over the last 30
+                            days.
+                        </Text>
+                    </div>
+                    <Flex justifyContent="end">
+                        <Link
+                            href={route("base.bust-cache", base.id)}
+                            method="post"
+                            as="button"
+                            type="button"
+                            className="text-indigo-600 flex gap-1 items-center"
+                        >
+                            <ArrowPathIcon className="w-4 h-4" />
+                            Bust cache
+                        </Link>
+                    </Flex>
+                </Flex>
 
                 {/* Stats */}
                 <Grid numColsMd={3} className="mt-6 gap-6">
@@ -66,7 +85,9 @@ export default function Dashboard({ auth, errors, base, stats }) {
                             <Text className="truncate">
                                 /{" "}
                                 {millify(
-                                    auth.plan.options.max_monthly_requests
+                                    auth.plan
+                                        ? auth.plan.options.max_monthly_requests
+                                        : 0
                                 )}
                             </Text>
                         </Flex>
@@ -88,7 +109,10 @@ export default function Dashboard({ auth, errors, base, stats }) {
                             <Text className="truncate">
                                 /{" "}
                                 {millify(
-                                    auth.plan.options.max_monthly_unique_users
+                                    auth.plan
+                                        ? auth.plan.options
+                                              .max_monthly_unique_users
+                                        : 0
                                 )}
                             </Text>
                         </Flex>
@@ -108,14 +132,16 @@ export default function Dashboard({ auth, errors, base, stats }) {
                         <div>
                             <Title>API Token</Title>
                             <Text>
-                                {auth.plan.name !== "Team" &&
+                                {auth.plan &&
+                                auth.plan.name !== "Team" &&
                                 auth.plan.name !== "Business"
                                     ? "You need a Team or Business subscription in order to create API tokens."
                                     : base.data?.apiToken
                                     ? "The APIs under this base are protected with an API key."
                                     : "The APIs under this base are unprotected and can be accessed by anyone."}
                             </Text>
-                            {auth.plan.name !== "Team" &&
+                            {auth.plan &&
+                                auth.plan.name !== "Team" &&
                                 auth.plan.name !== "Business" && (
                                     <a href="/billing">
                                         <Text color="indigo">
@@ -126,6 +152,7 @@ export default function Dashboard({ auth, errors, base, stats }) {
                         </div>
                         <Button
                             disabled={
+                                auth.plan &&
                                 auth.plan.name !== "Team" &&
                                 auth.plan.name !== "Business"
                             }

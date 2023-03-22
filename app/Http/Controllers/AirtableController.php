@@ -49,6 +49,8 @@ class AirtableController extends Controller
 
     public function getRecords(string $base_id, string $table_id, string|null $view_id = null, int $page = 1, int $per_page = 100): array
     {
+        // TODO: Work out how we're going to do the $page variable.
+
         $params = [
             // "filterByFormula" => "AND( Status = 'New' )",
             // "sort" => [['field' => 'Count', 'direction' => "desc"]],
