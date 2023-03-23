@@ -51,6 +51,25 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // Delete all of the user's views, tables, bases.
+        $user->bases()->each(function ($base) {
+            $base->tables()->each(function ($table) {
+                $table->views()->delete();
+            });
+
+            $base->tables()->delete();
+        });
+
+        $user->bases()->delete();
+
+        // Delete all of the user's API tokens.
+        $user->apiTokens()->delete();
+
+        // Cancel the user's subscription.
+        if (optional($user->subscription())->recurring()) {
+            $user->subscription()->cancelNow();
+        }
+
         Auth::logout();
 
         $user->delete();

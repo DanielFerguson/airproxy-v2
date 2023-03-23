@@ -89,7 +89,7 @@ return [
         // Features::billingAddressCollection(['required' => true]),
         // Features::mustAcceptTerms(),
         // Features::euVatCollection(['home-country' => 'BE']),
-        // Features::receiptEmails(['custom-addresses' => true]),
+        Features::receiptEmails(['custom-addresses' => true]),
         Features::paymentNotificationEmails(),
     ],
 

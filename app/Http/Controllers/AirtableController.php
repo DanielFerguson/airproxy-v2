@@ -47,17 +47,18 @@ class AirtableController extends Controller
         return $response->json()['tables'];
     }
 
-    public function getRecords(string $base_id, string $table_id, string|null $view_id = null, int $page = 1, int $per_page = 100): array
+    // TODO: Work out how we're going to do the $page variable.
+    public function getRecords(string $base_id, string $table_id, string|null $view_id = null, int $page = 1, int $per_page = 100, string|null $filter = null): array
     {
-        // TODO: Work out how we're going to do the $page variable.
-
         $params = [
-            // "filterByFormula" => "AND( Status = 'New' )",
-            // "sort" => [['field' => 'Count', 'direction' => "desc"]],
-            "maxRecords" => 100, // TODO: Dependant on account subscription level
+            "maxRecords" => 100,
             "pageSize" => $per_page,
             "view" => $view_id
         ];
+
+        if ($filter) {
+            $params['filterByFormula'] = $filter;
+        }
 
         $airtable = new Airtable([
             'api_key' => $this->token,
@@ -72,8 +73,6 @@ class AirtableController extends Controller
             $records = array_merge($records, $response->records);
         } while ($request = $response->next());
 
-        // TODO: Make this optional for higher accounts?
-        // Pluck out the fields
         $records = array_map(function ($record) {
             return $record->fields;
         }, $records);
