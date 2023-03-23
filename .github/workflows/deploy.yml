@@ -16,10 +16,10 @@ jobs:
           php-version: 8.2
           tools: composer:v2
           coverage: none
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-dev
       - name: Authenticate Laravel Spark
         run: composer config http-basic.spark.laravel.com ${{ secrets.SPARK_USERNAME }} ${{ secrets.SPARK_API_TOKEN }}
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-dev
       - name: Require Vapor CLI
         run: composer global require laravel/vapor-cli
       - name: Deploy Environment
