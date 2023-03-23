@@ -5,7 +5,28 @@ on:
     branches: [main]
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          tools: composer:v2
+          coverage: none
+      - name: Authenticate Laravel Spark
+        run: composer config http-basic.spark.laravel.com ${{ secrets.SPARK_USERNAME }} ${{ secrets.SPARK_API_TOKEN }}
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction
+      - name: Execute tests
+        run: ./vendor/bin/pest
+      - name: Check for ray calls
+        run: ./vendor/bin/x-ray . --compact
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code

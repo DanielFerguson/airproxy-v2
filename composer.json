@@ -32,7 +32,8 @@
         "nunomaduro/collision": "^6.4",
         "pestphp/pest": "^1.22",
         "pestphp/pest-plugin-laravel": "^1.2",
-        "spatie/laravel-ignition": "^2.0"
+        "spatie/laravel-ignition": "^2.0",
+        "spatie/x-ray": "^1.1"
     },
     "repositories": [
         {

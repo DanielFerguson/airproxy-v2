@@ -45,8 +45,6 @@ class DownloadAndStoreFile implements ShouldQueue
             return;
         }
 
-        ray($this->path);
-
         Storage::put($this->path, $file);
     }
 }
