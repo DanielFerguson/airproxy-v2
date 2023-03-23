@@ -20,8 +20,6 @@ use Illuminate\Database\Query\Builder;
 |
 */
 
-const ONE_HOUR_IN_SECONDS = 60 * 60;
-
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -33,11 +31,13 @@ Route::prefix('v1')->group(function () {
         return null;
     });
 
-    // TODO: Add filter - available to Team+, allows for simple single filter
+    // TODO: Add filter - available to Team & Enterprise, allows for simple single filter
     // TODO: Add formula - available to Enterprise, allows the user to pass in a formula
     // TODO: Add sortBy
     // TODO: Add ability to eager load relationships?
     Route::get('/{base_id}/{table_id}/{view_id?}', function (Request $request, string $base_id, string $table_id, string|null $view_id = null) {
+        $cache = Cache::tags(["base:$base_id", "table:$table_id", "view:$view_id"]);
+
         $page = $request->query('page', '1');
         $per_page = $request->query('perPage', '100');
 
@@ -67,14 +67,13 @@ Route::prefix('v1')->group(function () {
             'country' => $request->header('cf-ipcountry'),
         ]);
 
-        $check_key = "check-base:{$base_id}:table:{$table_id}:view:{$view_id}";
-
         // Check that the base, table, and view exists, and that the base and table are active
-        $check = Cache::tags(['check'])->remember(
-            $check_key,
-            ONE_HOUR_IN_SECONDS,
+        $check = $cache->remember(
+            "check",
+            now()->addDay(),
             fn () => DB::table('bases')
                 ->select(
+                    'bases.user_id',
                     'bases.is_active AS base_is_active,',
                     'tables.is_active AS table_is_active',
                     'api_tokens.value AS token',
@@ -106,7 +105,7 @@ Route::prefix('v1')->group(function () {
         }
 
         // Destructure $results
-        [$base_is_active, $table_is_active, $token, $secret, $ttl, $view_is_active] = array_values((array) $check);
+        [$user_id, $base_is_active, $table_is_active, $token, $secret, $ttl, $view_is_active] = array_values((array) $check);
 
         // If the base, table or view is not active, return a 404
         if (!$base_is_active || !$table_is_active || ($view_id && !$view_is_active)) {
@@ -124,12 +123,11 @@ Route::prefix('v1')->group(function () {
             ], 401);
         }
 
-        // TODO: Add formula, filter, and sort to the cache key
-        $cache_key = "data-base:{$base_id}:table:{$table_id}:view:{$view_id}:page:{$page}:per_page:{$per_page}";
+        $cache_key = "data-page:$page-per_page:$per_page";
 
         // If the data exists in the cache, return it
-        if (Cache::has($cache_key)) {
-            return response()->json(Cache::get($cache_key));
+        if ($cache->has($cache_key)) {
+            return response()->json($cache->get($cache_key));
         }
 
         // Fetch the data from Airtable
@@ -137,11 +135,11 @@ Route::prefix('v1')->group(function () {
         $data = $airtable->getRecords($base_id, $table_id, $view_id, $page, $per_page);
 
         // Cache the data for the base's TTL
-        Cache::tags(["data", "base:$base_id", "table:$table_id", "view:$view_id"])->put($cache_key, $data, $ttl);
+        $cache->put($cache_key, $data, now()->addSeconds($ttl));
 
         // Fire off a job to fetch and cache all of the static files
         CacheStaticFiles::dispatchAfterResponse(
-            user_id: $request->user()->id,
+            user_id: $user_id,
             data: $data
         );
 

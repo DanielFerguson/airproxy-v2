@@ -15,7 +15,7 @@ class BaseController extends Controller
     {
         $result = DB::select(
             "SELECT
-                COUNT(*) AS total_requests
+                COUNT(*) AS total_requests,
                 COUNT(DISTINCT ip_address) AS unique_users
             FROM
                 requests
