@@ -54,7 +54,7 @@ class AirtableController extends Controller
         $params = [
             // "filterByFormula" => "AND( Status = 'New' )",
             // "sort" => [['field' => 'Count', 'direction' => "desc"]],
-            "maxRecords" => 200, // TODO: Dependant on account subscription level
+            "maxRecords" => 100, // TODO: Dependant on account subscription level
             "pageSize" => $per_page,
             "view" => $view_id
         ];

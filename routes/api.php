@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,8 +28,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix('v1')->group(function () {
     // TODO: Record the request
     Route::get('/asset/{asset_id}', function ($asset_id) {
-        // Serve the static file
-        return null;
+        return Storage::download($asset_id);
     });
 
     // TODO: Add filter - available to Team & Enterprise, allows for simple single filter
@@ -73,7 +73,6 @@ Route::prefix('v1')->group(function () {
             now()->addDay(),
             fn () => DB::table('bases')
                 ->select(
-                    'bases.user_id',
                     'bases.is_active AS base_is_active,',
                     'tables.is_active AS table_is_active',
                     'api_tokens.value AS token',
@@ -105,7 +104,7 @@ Route::prefix('v1')->group(function () {
         }
 
         // Destructure $results
-        [$user_id, $base_is_active, $table_is_active, $token, $secret, $ttl, $view_is_active] = array_values((array) $check);
+        [$base_is_active, $table_is_active, $token, $secret, $ttl, $view_is_active] = array_values((array) $check);
 
         // If the base, table or view is not active, return a 404
         if (!$base_is_active || !$table_is_active || ($view_id && !$view_is_active)) {
@@ -139,10 +138,9 @@ Route::prefix('v1')->group(function () {
 
         // Fire off a job to fetch and cache all of the static files
         CacheStaticFiles::dispatchAfterResponse(
-            user_id: $user_id,
             data: $data
         );
 
         return response()->json($data);
-    });
+    })->middleware('gzipped');
 });

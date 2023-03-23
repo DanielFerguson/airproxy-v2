@@ -20,12 +20,11 @@ class DownloadAndStoreFile implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        string $user_id,
         private readonly string $url,
         string $id,
         string $filename,
     ) {
-        $this->path = "$user_id/$id-$filename";
+        $this->path = "$id-$filename";
     }
 
     /**
@@ -45,6 +44,8 @@ class DownloadAndStoreFile implements ShouldQueue
         if ($file === false) {
             return;
         }
+
+        ray($this->path);
 
         Storage::put($this->path, $file);
     }
