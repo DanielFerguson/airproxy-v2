@@ -1,7 +1,11 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 import millify from "millify";
-import { PauseIcon, ArrowPathIcon } from "@heroicons/react/20/solid";
+import {
+    PauseIcon,
+    ArrowPathIcon,
+    InformationCircleIcon,
+} from "@heroicons/react/20/solid";
 import {
     PauseCircleIcon,
     ShareIcon,
@@ -24,9 +28,17 @@ import {
     TableBody,
     TableCell,
     Badge,
+    AreaChart,
 } from "@tremor/react";
 
-export default function Dashboard({ auth, errors, base, stats, message }) {
+export default function Dashboard({
+    auth,
+    errors,
+    base,
+    stats,
+    message,
+    requests,
+}) {
     return (
         <AuthenticatedLayout
             auth={auth}
@@ -125,6 +137,21 @@ export default function Dashboard({ auth, errors, base, stats, message }) {
                         <Metric>{base.secret ? "Protected" : "Public"}</Metric>
                     </Card>
                 </Grid>
+
+                {/* Requests Charts */}
+                <Card className="mt-6">
+                    <Title>Requests</Title>
+                    <Text>
+                        Live requests over the last hour. Time is in UTC.
+                    </Text>
+
+                    <AreaChart
+                        data={requests}
+                        categories={["requests"]}
+                        index="minute"
+                        colors={["indigo"]}
+                    />
+                </Card>
 
                 {/* API Token */}
                 <Card className="mt-6">

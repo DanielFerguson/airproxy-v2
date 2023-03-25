@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use \TANIOS\Airtable\Airtable;
@@ -47,8 +48,7 @@ class AirtableController extends Controller
         return $response->json()['tables'];
     }
 
-    // TODO: Work out how we're going to do the $page variable.
-    public function getRecords(string $base_id, string $table_id, string|null $view_id = null, int $page = 1, int $per_page = 100, string|null $filter = null): array
+    public function getRecords(string $base_id, string $table_id, string|null $view_id = null, int $per_page = 100, string|null $filter = null): array
     {
         $params = [
             "maxRecords" => 100,
@@ -60,22 +60,25 @@ class AirtableController extends Controller
             $params['filterByFormula'] = $filter;
         }
 
-        $airtable = new Airtable([
-            'api_key' => $this->token,
-            'base'    => $base_id
-        ]);
-
         $records = [];
-        $request = $airtable->getContent($table_id, $params);
 
-        do {
-            $response = $request->getResponse();
-            $records = array_merge($records, $response->records);
-        } while ($request = $response->next());
+        Cache::lock("token:$this->token", 1)->block(10, function () use (&$records, $base_id, $table_id, $params) {
+            $airtable = new Airtable([
+                'api_key' => $this->token,
+                'base'    => $base_id
+            ]);
 
-        $records = array_map(function ($record) {
-            return $record->fields;
-        }, $records);
+            $request = $airtable->getContent($table_id, $params);
+
+            do {
+                $response = $request->getResponse();
+                $records = array_merge($records, $response->records);
+            } while ($request = $response->next());
+
+            $records = array_map(function ($record) {
+                return $record->fields;
+            }, $records);
+        });
 
         return $records;
     }

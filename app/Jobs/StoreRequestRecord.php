@@ -2,13 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Models\Request;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
 
 class StoreRequestRecord implements ShouldQueue
 {
@@ -18,7 +18,11 @@ class StoreRequestRecord implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private readonly array $request,
+        public string $type,
+        public string $id,
+        public string $ip_address,
+        public string $user_agent,
+        public array $headers,
     ) {
     }
 
@@ -27,6 +31,12 @@ class StoreRequestRecord implements ShouldQueue
      */
     public function handle(): void
     {
-        DB::table('requests')->insert($this->request);
+        Request::create([
+            'requestable_type' => $this->type,
+            'requestable_id' => $this->id,
+            'ip_address' => $this->ip_address,
+            'user_agent' => $this->user_agent,
+            'headers' => $this->headers,
+        ]);
     }
 }

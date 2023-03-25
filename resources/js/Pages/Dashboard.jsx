@@ -1,12 +1,9 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 import millify from "millify";
-import { PauseIcon, PlayIcon, ArrowPathIcon } from "@heroicons/react/20/solid";
 import {
-    KeyIcon,
     LockClosedIcon,
     LockOpenIcon,
-    PauseCircleIcon,
     SignalIcon,
     SignalSlashIcon,
 } from "@heroicons/react/24/outline";
@@ -18,7 +15,6 @@ import {
     Flex,
     Metric,
     Grid,
-    Button,
     Table,
     TableHead,
     TableRow,
@@ -26,9 +22,10 @@ import {
     TableBody,
     TableCell,
     Badge,
+    AreaChart,
 } from "@tremor/react";
 
-export default function Dashboard({ auth, errors, bases, stats }) {
+export default function Dashboard({ auth, errors, bases, stats, requests }) {
     return (
         <AuthenticatedLayout
             auth={auth}
@@ -103,34 +100,20 @@ export default function Dashboard({ auth, errors, bases, stats }) {
                         </Flex>
                     </Card>
                 </Grid>
-                {/* TODO: When I've done everything else. */}
                 {/* Requests Charts */}
-                {/* <Card className="mt-6">
+                <Card className="mt-6">
                     <Title>Requests</Title>
                     <Text>
-                        Live requests over the last 30 minutes. Time is in UTC.
+                        Live requests over the last hour. Time is in UTC.
                     </Text>
 
                     <AreaChart
-                            data={requests.data}
-                            categories={["Requests"]}
-                            dataKey="Date"
-                            height="h-72"
-                            colors={["indigo"]}
-                            marginTop="mt-4"
-                        />
-
-                    {requests.data && requests.data.length === 0 && (
-                            <Callout
-                                title="Where are my cool charts, dude?"
-                                text="When you start receiving requests, you will be able to monitor them here."
-                                icon={InformationCircleIcon}
-                                color="yellow"
-                                height=""
-                                marginTop="mt-5"
-                            />
-                        )}
-                </Card> */}
+                        data={requests}
+                        categories={["requests"]}
+                        index="minute"
+                        colors={["indigo"]}
+                    />
+                </Card>
                 {/* Bases */}
                 <Card className="mt-6">
                     <Title>Bases</Title>

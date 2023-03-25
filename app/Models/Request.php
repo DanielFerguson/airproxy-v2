@@ -10,22 +10,20 @@ class Request extends Model
     use HasFactory;
 
     protected $fillable = [
-        'base_id',
-        'table_id',
-        'view_id',
-        'page',
-        'per_page',
+        'requestable_type',
+        'requestable_id',
         'ip_address',
         'user_agent',
-        'referrer',
         'headers',
-        'asn',
         'country',
-        'region',
     ];
 
-    public function table()
+    protected $casts = [
+        'headers' => 'array',
+    ];
+
+    public function requestable()
     {
-        return $this->belongsTo(Table::class);
+        return $this->morphTo();
     }
 }

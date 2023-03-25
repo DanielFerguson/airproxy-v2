@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Base;
 use App\Models\Table;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -12,16 +13,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('views', function (Blueprint $table) {
+        Schema::create('assets', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->timestamps();
 
+            $table->string('filename');
+            $table->string('path');
+            $table->integer('size');
+
+            $table->foreignIdFor(Base::class);
             $table->foreignIdFor(Table::class);
-
-            $table->string('name');
-            $table->string('type');
-
-            $table->boolean('is_active')->default(true);
         });
     }
 
@@ -30,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('views');
+        Schema::dropIfExists('assets');
     }
 };

@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\ProfileController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -24,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $user_id = auth()->user()->id;
 
+        // TODO: Fix these queries
+
         $result = DB::select(
             "SELECT
                 COUNT(*) AS total_requests,
@@ -31,14 +32,54 @@ Route::middleware(['auth', 'verified'])->group(function () {
             FROM
                 requests
             WHERE
-                base_id IN(
+                requestable_type = 'table' AND 
+                requestable_id IN(
                     SELECT
-                        id FROM bases
+                        tables.id 
+                    FROM
+                        tables
+                    LEFT JOIN bases ON bases.id = tables.base_id 
                     WHERE
-                        user_id = :user_id) AND
-                created_at > DATE_SUB(NOW(), INTERVAL 30 DAY);",
+                        bases.user_id = :user_id)
+                AND created_at > DATE_SUB(NOW(), INTERVAL 30 DAY);",
             ['user_id' => $user_id]
         )[0];
+
+        $requests = collect(DB::select(
+            "SELECT
+                COUNT(id) AS requests,
+                DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:00') AS minute
+            FROM
+                requests
+            WHERE
+                created_at > :one_hour_ago AND
+                requestable_type = 'table' AND
+                requestable_id IN(
+                    SELECT
+                        tables.id 
+                    FROM
+                        tables
+                    LEFT JOIN bases ON bases.id = tables.base_id 
+                    WHERE
+                        bases.user_id = :user_id)
+            GROUP BY
+                minute
+            ORDER BY
+                minute DESC;",
+            [':one_hour_ago' => now()->subHour()->toDateTimeString(), ':user_id' => $user_id]
+        ))->pluck('requests', 'minute');
+
+        $normalised_requests = [];
+        $last_hour = now()->subHour();
+
+        for ($i = 0; $i < 60; $i++) {
+            $minute = $last_hour->addMinute()->startOfMinute()->toDateTimeString();
+
+            $normalised_requests[] = [
+                'minute' => $minute,
+                'requests' => $requests->get($minute, 0),
+            ];
+        }
 
         return Inertia::render('Dashboard', [
             'bases' => auth()->user()->bases()->with('tables')->get(),
@@ -46,6 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 'total_requests' => $result->total_requests,
                 'unique_users' => $result->unique_users,
             ],
+            'requests' => $normalised_requests,
         ]);
     })->name('dashboard');
 
@@ -54,10 +96,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/bases/{base}/disable', 'disable')->name('base.disable');
         Route::post('/bases/{base}/bust-cache', 'bustCache')->name('base.bust-cache');
     });
-});
 
-
-Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

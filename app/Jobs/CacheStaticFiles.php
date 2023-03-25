@@ -18,7 +18,9 @@ class CacheStaticFiles implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        private readonly array $data
+        private readonly array $data,
+        private readonly string $base_id,
+        private readonly string $table_id,
     ) {
     }
 
@@ -47,6 +49,9 @@ class CacheStaticFiles implements ShouldQueue
                         url: $v->url,
                         id: $v->id,
                         filename: $v->filename,
+                        size: $v->size,
+                        base_id: $this->base_id,
+                        table_id: $this->table_id,
                     );
                 }
             }

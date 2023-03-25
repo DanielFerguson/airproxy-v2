@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Asset;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,8 +22,11 @@ class DownloadAndStoreFile implements ShouldQueue
      */
     public function __construct(
         private readonly string $url,
-        string $id,
-        string $filename,
+        private readonly string $id,
+        private readonly string $filename,
+        private readonly int $size,
+        private readonly string $base_id,
+        private readonly string $table_id,
     ) {
         $this->path = "$id-$filename";
     }
@@ -46,5 +50,19 @@ class DownloadAndStoreFile implements ShouldQueue
         }
 
         Storage::put($this->path, $file);
+
+        // Store the file metadata
+        Asset::updateOrCreate(
+            [
+                'id' => $this->id,
+            ],
+            [
+                'filename' => $this->filename,
+                'size' => $this->size,
+                'path' => $this->path,
+                'base_id' => $this->base_id,
+                'table_id' => $this->table_id,
+            ]
+        );
     }
 }

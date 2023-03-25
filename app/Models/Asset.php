@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class View extends Model
+class Asset extends Model
 {
     use HasFactory;
 
@@ -14,11 +14,22 @@ class View extends Model
 
     protected $fillable = [
         'id',
+        'base_id',
         'table_id',
-        'name',
-        'type',
-        'is_active',
+        'path',
+        'filename',
+        'size',
     ];
+
+    public function requests()
+    {
+        return $this->morphMany(Request::class, 'requestable');
+    }
+
+    public function base()
+    {
+        return $this->belongsTo(Base::class);
+    }
 
     public function table()
     {

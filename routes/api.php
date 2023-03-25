@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\AirtableController;
 use App\Jobs\CacheStaticFiles;
-use App\Jobs\StoreRequestRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -26,38 +25,19 @@ Route::prefix('v1')->group(function () {
         return Storage::download($asset_id);
     });
 
-    Route::get('/{base_id}/{table_id}/{view_id?}', function (Request $request, string $base_id, string $table_id, string|null $view_id = null) {
+    Route::get('/data/{base_id}/{table_id}', function (Request $request, string $base_id, string $table_id) {
+        $view_id = $request->query('view', null);
+
         $cache = Cache::tags(["base:$base_id", "table:$table_id", "view:$view_id"]);
 
-        $page = $request->query('page', '1');
         $per_page = $request->query('perPage', '100');
         $filter = $request->query('filter', null);
-
-        if (intval($page) < 1) {
-            return response()->json([
-                'error' => 'Page must be positive.',
-            ], 400);
-        }
 
         if (intval($per_page) < 1 || intval($per_page) > 100) {
             return response()->json([
                 'error' => 'perPage must be between 1 and 100.',
             ], 400);
         }
-
-        StoreRequestRecord::dispatchAfterResponse([
-            'created_at' => now(),
-            'base_id' => $base_id,
-            'table_id' => $table_id,
-            'view_id' => $view_id,
-            'page' => $page,
-            'per_page' => $per_page,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'referrer' => $request->header('Referer'),
-            'headers' => json_encode($request->headers->all()),
-            'country' => $request->header('cf-ipcountry'),
-        ]);
 
         // Check that the base, table, and view exists, and that the base and table are active
         $check = $cache->remember(
@@ -114,7 +94,7 @@ Route::prefix('v1')->group(function () {
             ], 401);
         }
 
-        $cache_key = "data-page:$page:per_page:$per_page:filter:$filter";
+        $cache_key = "data-per_page:$per_page:filter:$filter";
 
         // If the data exists in the cache, return it
         if ($cache->has($cache_key)) {
@@ -123,14 +103,16 @@ Route::prefix('v1')->group(function () {
 
         // Fetch the data from Airtable
         $airtable = new AirtableController($token);
-        $data = $airtable->getRecords($base_id, $table_id, $view_id, $page, $per_page, $filter);
+        $data = $airtable->getRecords($base_id, $table_id, $view_id, $per_page, $filter);
 
         // Cache the data for the base's TTL
         $cache->put($cache_key, $data, now()->addSeconds($ttl));
 
         // Fire off a job to fetch and cache all of the static files
         CacheStaticFiles::dispatchAfterResponse(
-            data: $data
+            data: $data,
+            base_id: $base_id,
+            table_id: $table_id,
         );
 
         return response()->json($data);
