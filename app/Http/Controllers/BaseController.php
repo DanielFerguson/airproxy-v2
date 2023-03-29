@@ -66,6 +66,11 @@ class BaseController extends Controller
                 'unique_users' => $result->unique_users,
                 'requests' => $requests,
             ],
+            'permissions' => [
+                'can_bust_cache' => auth()->user()->can('bustCache', $base),
+                'can_disable' => auth()->user()->can('disable', $base),
+                'can_create_token' => auth()->user()->can('createToken', $base),
+            ],
             'requests' => $normalised_requests,
         ]);
     }
@@ -102,5 +107,17 @@ class BaseController extends Controller
 
         // TODO: Return a success message to trigger a toast
         return to_route('base', $base);
+    }
+
+    public function createToken(Request $request, Base $base): RedirectResponse
+    {
+        // Check whether the user can create a token for this base (if the base belongs to them)
+        if ($request->user()->cannot('createToken', $base)) {
+            abort(403);
+        }
+
+        // TODO: Create a new token
+
+        return redirect()->back();
     }
 }

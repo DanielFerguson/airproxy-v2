@@ -69,17 +69,6 @@ class ImportAirtableAccount extends Command
                 ], [
                     'name' => $table['name'],
                 ]);
-
-                $this->info("Importing table {$table['name']}...");
-
-                foreach ($table['views'] as $view) {
-                    $view = $table_record->views()->updateOrCreate([
-                        'id' => $view['id'],
-                    ], [
-                        'name' => $view['name'],
-                        'type' => $view['type'],
-                    ]);
-                }
             }
         }
 

@@ -1,13 +1,8 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link } from "@inertiajs/react";
 import millify from "millify";
+import { PauseIcon, ArrowPathIcon } from "@heroicons/react/20/solid";
 import {
-    PauseIcon,
-    ArrowPathIcon,
-    InformationCircleIcon,
-} from "@heroicons/react/20/solid";
-import {
-    PauseCircleIcon,
     ShareIcon,
     SignalIcon,
     SignalSlashIcon,
@@ -29,6 +24,7 @@ import {
     TableCell,
     Badge,
     AreaChart,
+    Col,
 } from "@tremor/react";
 
 export default function Dashboard({
@@ -38,7 +34,10 @@ export default function Dashboard({
     stats,
     message,
     requests,
+    permissions,
 }) {
+    console.log(permissions);
+
     return (
         <AuthenticatedLayout
             auth={auth}
@@ -52,31 +51,14 @@ export default function Dashboard({
             <Head title="Dashboard" />
             <Toaster />
 
-            {JSON.stringify(message)}
-
             {/* Bases */}
             <div className="mx-auto max-w-3xl px-4 pb-24 sm:mt-8">
-                <Flex>
-                    <div>
-                        <Title>{base.name}</Title>
-                        <Text>
-                            Interact with tables, and stats over the last 30
-                            days.
-                        </Text>
-                    </div>
-                    <Flex justifyContent="end">
-                        <Link
-                            href={route("base.bust-cache", base.id)}
-                            method="post"
-                            as="button"
-                            type="button"
-                            className="text-indigo-600 flex gap-1 items-center"
-                        >
-                            <ArrowPathIcon className="w-4 h-4" />
-                            Bust cache
-                        </Link>
-                    </Flex>
-                </Flex>
+                <Col>
+                    <Title>{base.name}</Title>
+                    <Text>
+                        Interact with tables, and stats over the last 30 days.
+                    </Text>
+                </Col>
 
                 {/* Stats */}
                 <Grid numColsMd={3} className="mt-6 gap-6">
@@ -156,31 +138,48 @@ export default function Dashboard({
                 {/* API Token */}
                 <Card className="mt-6">
                     <Flex>
-                        <div>
+                        <Col>
                             <Title>API Token</Title>
                             <Text>
-                                {auth.plan &&
-                                auth.plan.name !== "Team" &&
-                                auth.plan.name !== "Business"
+                                {!permissions.can_create_token
                                     ? "You need a Team or Business subscription in order to create API tokens."
-                                    : base.data?.apiToken
+                                    : base.secret
                                     ? "The APIs under this base are protected with an API key."
                                     : "The APIs under this base are unprotected and can be accessed by anyone."}
                             </Text>
-                            {auth.plan &&
-                                auth.plan.name !== "Team" &&
-                                auth.plan.name !== "Business" && (
-                                    <a href="/billing">
-                                        <Text color="indigo">
-                                            Upgrade to get access to API keys.
-                                        </Text>
-                                    </a>
-                                )}
-                        </div>
-                        <Button
+                            {!permissions.can_create_token && (
+                                <Link href="/billing">
+                                    <Text color="indigo">
+                                        Upgrade to get access to API keys.
+                                    </Text>
+                                </Link>
+                            )}
+                        </Col>
+                        {!permissions.can_create_token ? (
+                            <Text>
+                                <Link
+                                    href="/billing?message=Upgrade to Team or Business to be able to secure your API endpoints."
+                                    className="underline text-indigo-600"
+                                >
+                                    Upgrade your plan.
+                                </Link>
+                            </Text>
+                        ) : (
+                            <Link href="/token/create">
+                                <Button
+                                    size="sm"
+                                    color="indigo"
+                                    importance="secondary"
+                                >
+                                    Create token
+                                </Button>
+                            </Link>
+                        )}
+                        {/* <Link>Create Token</Link> */}
+                        {/* <Button
                             disabled={
-                                auth.plan &&
-                                auth.plan.name !== "Team" &&
+                                !auth.plan ||
+                                auth.plan.name !== "Team" ||
                                 auth.plan.name !== "Business"
                             }
                             size="sm"
@@ -190,27 +189,19 @@ export default function Dashboard({
                             {base.data?.apiToken
                                 ? "Remove Token"
                                 : "Create Token"}
-                        </Button>
+                        </Button> */}
                     </Flex>
                 </Card>
 
                 {/* Tables */}
                 <Card className="mt-6">
                     <Flex>
-                        <div>
+                        <Col>
                             <Title>Tables</Title>
                             <Text>
                                 A list of all the tables, and their controls.
                             </Text>
-                        </div>
-                        <Flex className="items-end justify-end space-x-4">
-                            <Button icon={PauseCircleIcon} color="indigo">
-                                {base.tables.filter((table) => table.is_active)
-                                    .length > 0
-                                    ? "Disable all"
-                                    : "Enable all"}
-                            </Button>
-                        </Flex>
+                        </Col>
                     </Flex>
                     <Table className="mt-5">
                         <TableHead>
@@ -231,24 +222,22 @@ export default function Dashboard({
                                         <Text>{table.name}</Text>
                                     </TableCell>
                                     <TableCell>
-                                        <Text>
-                                            <Badge
-                                                color={
-                                                    table.is_active
-                                                        ? "emerald"
-                                                        : "gray"
-                                                }
-                                                icon={
-                                                    table.is_active
-                                                        ? SignalIcon
-                                                        : SignalSlashIcon
-                                                }
-                                            >
-                                                {table.is_active
-                                                    ? "Active"
-                                                    : "Disabled"}
-                                            </Badge>
-                                        </Text>
+                                        <Badge
+                                            color={
+                                                table.is_active
+                                                    ? "emerald"
+                                                    : "gray"
+                                            }
+                                            icon={
+                                                table.is_active
+                                                    ? SignalIcon
+                                                    : SignalSlashIcon
+                                            }
+                                        >
+                                            {table.is_active
+                                                ? "Active"
+                                                : "Disabled"}
+                                        </Badge>
                                     </TableCell>
                                     <TableCell>
                                         <Text>Coming Soon</Text>

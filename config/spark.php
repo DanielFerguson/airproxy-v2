@@ -3,6 +3,8 @@
 use App\Models\User;
 use Spark\Features;
 
+$isProduction = env('APP_ENV') === 'production';
+
 return [
 
     /*
@@ -140,8 +142,8 @@ return [
                 [
                     'name' => 'Hobby',
                     'short_description' => 'The essentials to get up and running immediately with Airtable.',
-                    'monthly_id' => 'price_1MnwxqFbI9pBujiNVv5vIZVJ',
-                    'yearly_id' => 'price_1MnwxqFbI9pBujiNv8hpW7n1',
+                    'monthly_id' => $isProduction ? 'price_1McxMrFbI9pBujiNgqGoJrmP' : 'price_1MnwxqFbI9pBujiNVv5vIZVJ',
+                    'yearly_id' => $isProduction ? 'price_1McxMrFbI9pBujiNiw8amjwF' : 'price_1MnwxqFbI9pBujiNv8hpW7n1',
                     'yearly_incentive' => 'Save 17%',
                     'features' => [
                         'Unlimited bases',
@@ -160,8 +162,8 @@ return [
                 [
                     'name' => 'Team',
                     'short_description' => 'A plan that scales with your rapidly growing business.',
-                    'monthly_id' => 'price_1MnwyQFbI9pBujiNilmd6sFs',
-                    'yearly_id' => 'price_1MnwyQFbI9pBujiN8QUWbKtx',
+                    'monthly_id' => $isProduction ? 'price_1McxNfFbI9pBujiNk1G9DYC3' : 'price_1MnwyQFbI9pBujiNilmd6sFs',
+                    'yearly_id' => $isProduction ? 'price_1McxNfFbI9pBujiNbBKDdaEs' : 'price_1MnwyQFbI9pBujiN8QUWbKtx',
                     'yearly_incentive' => 'Save 17%',
                     'features' => [
                         'Unlimited bases',
@@ -184,8 +186,8 @@ return [
                 [
                     'name' => 'Business',
                     'short_description' => 'Dedicated support and infrastructure for your company.',
-                    'monthly_id' => 'price_1MnwylFbI9pBujiN6try6JyO',
-                    'yearly_id' => 'price_1MnwylFbI9pBujiNvOuDAQda',
+                    'monthly_id' => $isProduction ? 'price_1McxOHFbI9pBujiNF9u2MBHN' : 'price_1MnwylFbI9pBujiN6try6JyO',
+                    'yearly_id' => $isProduction ? 'price_1McxOGFbI9pBujiNGwFVjrOg' : 'price_1MnwylFbI9pBujiNvOuDAQda',
                     'yearly_incentive' => 'Save 17%',
                     'features' => [
                         "Unlimited bases",

@@ -13,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tables', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id');
             $table->timestamps();
 
             $table->foreignIdFor(Base::class);
@@ -22,6 +22,8 @@ return new class extends Migration
 
             $table->boolean('is_active')->default(true);
             $table->integer('ttl')->default(600); // 10 minutes
+
+            $table->primary(['id', 'base_id']);
         });
     }
 

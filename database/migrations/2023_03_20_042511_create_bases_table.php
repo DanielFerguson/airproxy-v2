@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('bases', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id');
             $table->timestamps();
 
             $table->foreignIdFor(User::class);
@@ -25,6 +25,8 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
 
             $table->string('secret')->nullable();
+
+            $table->primary(['id', 'user_id']);
         });
     }
 

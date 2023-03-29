@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\ProfileController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -86,15 +88,43 @@ Route::middleware(['auth', 'verified'])->group(function () {
             'stats' => [
                 'total_requests' => $result->total_requests,
                 'unique_users' => $result->unique_users,
+                'api_tokens_count' => auth()->user()->apiTokens()->count(),
             ],
             'requests' => $normalised_requests,
         ]);
     })->name('dashboard');
 
+    Route::post('/tokens', function (Request $request) {
+        // Check that key is valid
+        $validated = $request->validate([
+            'key' => 'required',
+        ]);
+
+        $key = $validated['key'];
+
+        // Check that the key is valid
+        $result = Http::withToken($key)->get('https://api.airtable.com/v0/meta/bases');
+
+        if ($result->failed()) {
+            return redirect()->back()->with('error', 'Invalid API key');
+        }
+
+        // Create the token
+        $token = auth()->user()->apiTokens()->create([
+            'value' => $key,
+        ]);
+
+        // Import account data
+        $token->importAccount();
+
+        return redirect()->back()->with('success', 'Successfully created API token');
+    })->name('tokens.create');
+
     Route::controller(BaseController::class)->group(function () {
         Route::get('/bases/{base}', 'show')->name('base');
         Route::post('/bases/{base}/disable', 'disable')->name('base.disable');
         Route::post('/bases/{base}/bust-cache', 'bustCache')->name('base.bust-cache');
+        Route::post('/bases/{base}/token', 'createToken')->name('base.create-token');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
