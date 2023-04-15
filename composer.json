@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
+        "doctrine/dbal": "^3.6",
         "guzzlehttp/guzzle": "^7.2",
         "inertiajs/inertia-laravel": "^0.6.3",
         "laravel/framework": "^10.0",
@@ -18,7 +19,9 @@
         "laravel/tinker": "^2.8",
         "laravel/vapor-core": "^2.28",
         "laravel/vapor-ui": "^1.7",
+        "league/flysystem-aws-s3-v3": "^3.0",
         "sleiman/airtable-php": "^3.0",
+        "spatie/laravel-markdown": "^2.2",
         "spatie/laravel-ray": "^1.32",
         "spiral/roadrunner": "^2.8.2",
         "tightenco/ziggy": "^1.0"

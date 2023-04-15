@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class RefreshAirtableAccount implements ShouldQueue
+class FetchBases implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -41,24 +41,10 @@ class RefreshAirtableAccount implements ShouldQueue
                 'api_token_id' => $this->token->id,
             ]);
 
-            $tables = $airtable->listTables($base['id']);
-
-            foreach ($tables as $table) {
-                $table_record = $base_record->tables()->updateOrCreate([
-                    'id' => $table['id'],
-                ], [
-                    'name' => $table['name'],
-                ]);
-
-                foreach ($table['views'] as $view) {
-                    $view = $table_record->views()->updateOrCreate([
-                        'id' => $view['id'],
-                    ], [
-                        'name' => $view['name'],
-                        'type' => $view['type'],
-                    ]);
-                }
-            }
+            FetchTables::dispatch($airtable, $base_record);
         }
+
+        $user->airtable_imported = true;
+        $user->save();
     }
 }

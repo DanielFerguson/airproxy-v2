@@ -1,14 +1,14 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, router } from "@inertiajs/react";
 import millify from "millify";
 import {
     LockClosedIcon,
     LockOpenIcon,
     SignalIcon,
     SignalSlashIcon,
-    CheckIcon,
     KeyIcon,
     PlusIcon,
+    ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import toast, { Toaster } from "react-hot-toast";
 import {
@@ -41,6 +41,9 @@ export default function Dashboard({
     flash,
 }) {
     const [open, setOpen] = useState(stats.api_tokens_count === 0);
+    const loading =
+        stats.api_tokens_count === 0 || !auth.user.airtable_imported;
+
     const {
         data,
         setData,
@@ -57,6 +60,14 @@ export default function Dashboard({
             setOpen(false);
         }
     }, [flash]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({ only: ["bases", "stats", "requests", "auth"] });
+        }, 2500);
+
+        return () => clearInterval(interval);
+    }, []);
 
     function submit(e) {
         e.preventDefault();
@@ -81,7 +92,7 @@ export default function Dashboard({
                 <Dialog
                     as="div"
                     className="relative z-10"
-                    onClose={() => console.log("Hello")}
+                    onClose={() => false}
                 >
                     <Transition.Child
                         as={Fragment}
@@ -294,6 +305,17 @@ export default function Dashboard({
                             </TableRow>
                         </TableHead>
                         <TableBody>
+                            {loading && (
+                                <TableRow>
+                                    <TableCell colSpan={4}>
+                                        <Flex className="justify-center space-x-3">
+                                            <ArrowPathIcon className="h-6 w-6 text-indigo-700 animate-spin" />
+                                            <Text>Loading...</Text>
+                                        </Flex>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+
                             {bases.map((base) => (
                                 <TableRow key={base.id}>
                                     <TableCell>

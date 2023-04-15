@@ -40,5 +40,8 @@ class ApiToken extends Model
                 ]);
             }
         }
+
+        $this->user->airtable_imported = true;
+        $this->user->save();
     }
 }

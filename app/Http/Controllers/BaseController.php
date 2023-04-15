@@ -60,6 +60,10 @@ class BaseController extends Controller
         }
 
         return Inertia::render('Base', [
+            'auth' => [
+                'user' => auth()->user(),
+                'plan' => auth()->user() ? auth()->user()->sparkPlan() : null,
+            ],
             'base' => $base->load('tables'),
             'stats' => [
                 'total_requests' => $result->total_requests,
@@ -89,9 +93,6 @@ class BaseController extends Controller
         return to_route('base', $base);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function disable(Request $request, Base $base): RedirectResponse
     {
         // Check whether the user can disable this base (if the base belongs to them)
@@ -99,8 +100,9 @@ class BaseController extends Controller
             abort(403);
         }
 
-        // Disable the base
-        $base->update(['is_active' => false]);
+        // Toggle the status of the base is_active flag
+        $base->is_active = !$base->is_active;
+        $base->save();
 
         // Bust the cache
         Cache::tags(["base:$base->id"])->flush();

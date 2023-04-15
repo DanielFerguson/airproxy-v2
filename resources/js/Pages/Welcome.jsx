@@ -30,7 +30,7 @@ const navigation = [
     { name: "Features", href: "/#features" },
     { name: "Pricing", href: "/#pricing" },
     { name: "Blog", href: "/blog" },
-    { name: "Docs", href: "/documentation" },
+    { name: "Docs", href: "https://docs.airproxy.app" },
 ];
 
 const features = [

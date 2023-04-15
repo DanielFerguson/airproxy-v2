@@ -26,6 +26,7 @@
         "millify": "^6.1.0",
         "react-hot-toast": "^2.4.0",
         "react-tippy": "^1.4.0",
-        "recharts": "^2.5.0"
+        "recharts": "^2.5.0",
+        "shiki": "^0.14.1"
     }
 }

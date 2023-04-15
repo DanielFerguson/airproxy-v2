@@ -31,6 +31,16 @@ class StoreRequestRecord implements ShouldQueue
      */
     public function handle(): void
     {
+        if ($this->type === 'table') {
+            // Check whether the id starts with tbl or not
+            $is_id = str_starts_with($this->id, 'tbl');
+
+            // If it doesn't, fetch the table id
+            if (!$is_id) {
+                $this->id = \App\Models\Table::where('name', $this->id)->first()->id;
+            }
+        }
+
         Request::create([
             'requestable_type' => $this->type,
             'requestable_id' => $this->id,

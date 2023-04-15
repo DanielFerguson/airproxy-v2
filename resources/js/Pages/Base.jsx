@@ -1,13 +1,13 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Head, Link } from "@inertiajs/react";
+import { Head, Link, router } from "@inertiajs/react";
 import millify from "millify";
-import { PauseIcon, ArrowPathIcon } from "@heroicons/react/20/solid";
+import { PauseIcon, PlayIcon } from "@heroicons/react/20/solid";
 import {
     ShareIcon,
     SignalIcon,
     SignalSlashIcon,
 } from "@heroicons/react/24/outline";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import {
     Text,
     Title,
@@ -26,6 +26,7 @@ import {
     AreaChart,
     Col,
 } from "@tremor/react";
+import { useEffect } from "react";
 
 export default function Dashboard({
     auth,
@@ -36,7 +37,13 @@ export default function Dashboard({
     requests,
     permissions,
 }) {
-    console.log(permissions);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({ only: ["base", "stats", "requests", "auth"] });
+        }, 2500);
+
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <AuthenticatedLayout
@@ -208,7 +215,6 @@ export default function Dashboard({
                             <TableRow>
                                 <TableHeaderCell>Name</TableHeaderCell>
                                 <TableHeaderCell>Status</TableHeaderCell>
-                                <TableHeaderCell>Requests</TableHeaderCell>
                                 <TableHeaderCell>TTL</TableHeaderCell>
                                 <TableHeaderCell>
                                     <span className="sr-only">Actions</span>
@@ -243,30 +249,43 @@ export default function Dashboard({
                                         <Text>Coming Soon</Text>
                                     </TableCell>
                                     <TableCell>
-                                        <Text>Coming Soon</Text>
-                                    </TableCell>
-                                    <TableCell>
-                                        <Flex>
-                                            {/* Bust cache */}
-                                            <Button
-                                                icon={ArrowPathIcon}
-                                                size="xs"
-                                                color="indigo"
-                                                variant="light"
-                                            ></Button>
+                                        <Flex className="justify-end space-x-3">
                                             {/* Disable table */}
-                                            <Button
-                                                icon={PauseIcon}
-                                                size="xs"
-                                                color="indigo"
-                                                variant="light"
-                                            ></Button>
+                                            <Link
+                                                href={route(
+                                                    "table.toggle",
+                                                    table.id
+                                                )}
+                                                method="POST"
+                                                as="button"
+                                                className="inline-flex justify-center items-center group focus:outline-none focus:ring-2 focus:ring-offset-2 font-medium text-xs text-indigo-500 bg-transparent hover:text-indigo-700"
+                                            >
+                                                <Button
+                                                    icon={
+                                                        table.is_active
+                                                            ? PauseIcon
+                                                            : PlayIcon
+                                                    }
+                                                    size="xs"
+                                                    color="indigo"
+                                                    variant="light"
+                                                />
+                                            </Link>
                                             {/* Copy API URL */}
                                             <Button
                                                 icon={ShareIcon}
                                                 size="xs"
                                                 color="indigo"
                                                 variant="light"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(
+                                                        `${window.location.origin}/api/v1/data/${auth.user.uuid}/${base.name}/${table.name}`
+                                                    );
+
+                                                    toast.success(
+                                                        "Copied API URL to clipboard."
+                                                    );
+                                                }}
                                             ></Button>
                                         </Flex>
                                     </TableCell>

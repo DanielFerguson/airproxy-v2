@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TableController;
+use App\Jobs\FetchBases;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -21,11 +23,11 @@ use Inertia\Inertia;
 
 Route::inertia('/', 'Welcome');
 
+Route::get('/blog', fn () => view('blog.index'));
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $user_id = auth()->user()->id;
-
-        // TODO: Fix these queries
 
         $result = DB::select(
             "SELECT
@@ -84,6 +86,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         }
 
         return Inertia::render('Dashboard', [
+            'auth' => [
+                'user' => auth()->user(),
+                'plan' => auth()->user() ? auth()->user()->sparkPlan() : null,
+            ],
             'bases' => auth()->user()->bases()->with('tables')->get(),
             'stats' => [
                 'total_requests' => $result->total_requests,
@@ -109,13 +115,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->back()->with('error', 'Invalid API key');
         }
 
-        // Create the token
-        $token = auth()->user()->apiTokens()->create([
+        // Create the token if it doesnt exist
+        $token = auth()->user()->apiTokens()->firstOrCreate([
             'value' => $key,
         ]);
 
         // Import account data
-        $token->importAccount();
+        FetchBases::dispatch($token);
 
         return redirect()->back()->with('success', 'Successfully created API token');
     })->name('tokens.create');
@@ -125,6 +131,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/bases/{base}/disable', 'disable')->name('base.disable');
         Route::post('/bases/{base}/bust-cache', 'bustCache')->name('base.bust-cache');
         Route::post('/bases/{base}/token', 'createToken')->name('base.create-token');
+    });
+
+    Route::controller(TableController::class)->group(function () {
+        Route::post('/tables/{table}/toggle', 'toggle')->name('table.toggle');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

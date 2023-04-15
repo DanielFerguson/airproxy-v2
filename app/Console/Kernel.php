@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Jobs\RefreshAirtableAccount;
+use App\Jobs\FetchBases;
 use App\Models\ApiToken;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->call(function () {
             foreach (ApiToken::all() as $token) {
-                RefreshAirtableAccount::dispatch(token: $token);
+                FetchBases::dispatch(token: $token);
             }
         })->hourly();
 

@@ -16,8 +16,15 @@ class RecordApiRequest
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $requestable_id = str_contains($request->path(), '/data/') ? $request->route('table_id') : $request->route('asset_id');
-        $requestable_type = str_contains($request->path(), '/data/') ? 'table' : 'asset';
+        $is_data_route = str_contains($request->path(), '/data/');
+
+        $requestable_id = $is_data_route
+            ? $request->route('table_id')
+            : $request->route('asset_id');
+
+        $requestable_type = $is_data_route
+            ? 'table'
+            : 'asset';
 
         if ($requestable_id === null) {
             return $next($request);

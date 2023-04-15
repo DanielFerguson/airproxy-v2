@@ -69,7 +69,7 @@ export default function Authenticated({ auth, header, children }) {
                                 <Menu.Item>
                                     {({ active }) => (
                                         <Link
-                                            href="/docs"
+                                            href="docs.airproxy.app"
                                             target="_blank"
                                             className={`block px-4 py-2 text-sm text-gray-700 ${
                                                 active ? "bg-gray-100" : ""
