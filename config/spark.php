@@ -130,26 +130,25 @@ return [
     */
 
     'billables' => [
-
         'user' => [
             'model' => User::class,
-
-            'trial_days' => 5,
-
             'default_interval' => 'monthly',
-
             'plans' => [
                 [
                     'name' => 'Hobby',
                     'short_description' => 'The essentials to get up and running immediately with Airtable.',
                     'monthly_id' => $isProduction ? 'price_1McxMrFbI9pBujiNgqGoJrmP' : 'price_1MnwxqFbI9pBujiNVv5vIZVJ',
                     'yearly_id' => $isProduction ? 'price_1McxMrFbI9pBujiNiw8amjwF' : 'price_1MnwxqFbI9pBujiNv8hpW7n1',
-                    'yearly_incentive' => 'Save 17%',
+                    'yearly_incentive' => '2 months free',
                     'features' => [
-                        'Unlimited bases',
-                        'Unlimited tables',
-                        'Up to 2.5k unique users',
-                        'Up to 25k requests / month',
+                        "Up to 2.5k unique users",
+                        "Up to 25k requests / month",
+                        "Unlimited bases",
+                        "Unlimited tables",
+                        "Custom TTLs",
+                        "TypeScript definition generation",
+                        "API protection",
+                        "Image CDN",
                     ],
                     'options' => [
                         'max_monthly_unique_users' => 2_500,
@@ -164,12 +163,12 @@ return [
                     'short_description' => 'A plan that scales with your rapidly growing business.',
                     'monthly_id' => $isProduction ? 'price_1McxNfFbI9pBujiNk1G9DYC3' : 'price_1MnwyQFbI9pBujiNilmd6sFs',
                     'yearly_id' => $isProduction ? 'price_1McxNfFbI9pBujiNbBKDdaEs' : 'price_1MnwyQFbI9pBujiN8QUWbKtx',
-                    'yearly_incentive' => 'Save 17%',
+                    'yearly_incentive' => '2 months free',
                     'features' => [
-                        'Unlimited bases',
-                        'Unlimited tables',
                         "Up to 7.5k unique users",
                         "Up to 1M requests / month",
+                        "Unlimited bases",
+                        "Unlimited tables",
                         "Custom TTLs",
                         "TypeScript definition generation",
                         "API protection",
@@ -188,12 +187,12 @@ return [
                     'short_description' => 'Dedicated support and infrastructure for your company.',
                     'monthly_id' => $isProduction ? 'price_1McxOHFbI9pBujiNF9u2MBHN' : 'price_1MnwylFbI9pBujiN6try6JyO',
                     'yearly_id' => $isProduction ? 'price_1McxOGFbI9pBujiNGwFVjrOg' : 'price_1MnwylFbI9pBujiNvOuDAQda',
-                    'yearly_incentive' => 'Save 17%',
+                    'yearly_incentive' => '2 months free',
                     'features' => [
-                        "Unlimited bases",
-                        "Unlimited tables",
                         "Up to 40K unique users",
                         "Up to 100M requests / month",
+                        "Unlimited bases",
+                        "Unlimited tables",
                         "Custom TTLs",
                         "TypeScript definition generation",
                         "API protection",

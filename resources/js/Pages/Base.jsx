@@ -28,15 +28,7 @@ import {
 } from "@tremor/react";
 import { useEffect } from "react";
 
-export default function Dashboard({
-    auth,
-    errors,
-    base,
-    stats,
-    message,
-    requests,
-    permissions,
-}) {
+export default function Dashboard({ auth, errors, base, stats, requests }) {
     useEffect(() => {
         const interval = setInterval(() => {
             router.reload({ only: ["base", "stats", "requests", "auth"] });
@@ -147,32 +139,50 @@ export default function Dashboard({
                     <Flex>
                         <Col>
                             <Title>API Token</Title>
-                            <Text>
-                                {!permissions.can_create_token
-                                    ? "You need a Team or Business subscription in order to create API tokens."
-                                    : base.secret
-                                    ? "The APIs under this base are protected with an API key."
-                                    : "The APIs under this base are unprotected and can be accessed by anyone."}
-                            </Text>
-                            {!permissions.can_create_token && (
-                                <Link href="/billing">
-                                    <Text color="indigo">
-                                        Upgrade to get access to API keys.
+                            {base.secret ? (
+                                <>
+                                    <Text>
+                                        The APIs under this base are protected
+                                        with an API key.
                                     </Text>
-                                </Link>
+                                    <Text>
+                                        Read how to use it{" "}
+                                        <a
+                                            href="https://blog.airproxy.app/fetching-data/accessing-your-data#protection"
+                                            target="_blank"
+                                            className="text-indigo-600 hover:text-indigo-500"
+                                        >
+                                            here.
+                                        </a>
+                                    </Text>
+                                </>
+                            ) : (
+                                <Text>
+                                    The APIs under this base are unprotected and
+                                    can be accessed by anyone.
+                                </Text>
                             )}
                         </Col>
-                        {!permissions.can_create_token ? (
-                            <Text>
-                                <Link
-                                    href="/billing?message=Upgrade to Team or Business to be able to secure your API endpoints."
-                                    className="underline text-indigo-600"
-                                >
-                                    Upgrade your plan.
-                                </Link>
-                            </Text>
+                        {base.secret ? (
+                            <Button
+                                size="sm"
+                                color="indigo"
+                                importance="secondary"
+                                onClick={() => {
+                                    navigator.clipboard.writeText(base.secret);
+                                    toast.success(
+                                        "Copied API key to clipboard"
+                                    );
+                                }}
+                            >
+                                Copy key
+                            </Button>
                         ) : (
-                            <Link href="/token/create">
+                            <Link
+                                as="button"
+                                method="POST"
+                                href={route("base.create-token", base.id)}
+                            >
                                 <Button
                                     size="sm"
                                     color="indigo"
@@ -182,21 +192,6 @@ export default function Dashboard({
                                 </Button>
                             </Link>
                         )}
-                        {/* <Link>Create Token</Link> */}
-                        {/* <Button
-                            disabled={
-                                !auth.plan ||
-                                auth.plan.name !== "Team" ||
-                                auth.plan.name !== "Business"
-                            }
-                            size="sm"
-                            color="indigo"
-                            importance="secondary"
-                        >
-                            {base.data?.apiToken
-                                ? "Remove Token"
-                                : "Create Token"}
-                        </Button> */}
                     </Flex>
                 </Card>
 

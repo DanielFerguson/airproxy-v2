@@ -70,11 +70,6 @@ class BaseController extends Controller
                 'unique_users' => $result->unique_users,
                 'requests' => $requests,
             ],
-            'permissions' => [
-                'can_bust_cache' => auth()->user()->can('bustCache', $base),
-                'can_disable' => auth()->user()->can('disable', $base),
-                'can_create_token' => auth()->user()->can('createToken', $base),
-            ],
             'requests' => $normalised_requests,
         ]);
     }
@@ -118,7 +113,15 @@ class BaseController extends Controller
             abort(403);
         }
 
-        // TODO: Create a new token
+        // Generate a random UUID
+        $token = (string) \Illuminate\Support\Str::uuid();
+
+        // Update the base with the new token as a secret
+        $base->secret = $token;
+        $base->save();
+
+        // Bust the cache
+        Cache::tags(["base:$base->id"])->flush();
 
         return redirect()->back();
     }

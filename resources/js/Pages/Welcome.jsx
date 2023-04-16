@@ -129,12 +129,15 @@ const pricing = {
             description:
                 "The essentials to get up and running immediately with Airtable.",
             features: [
-                "Unlimited bases",
-                "Unlimited tables",
                 "Up to 2.5k unique users",
                 "Up to 25k requests / month",
+                "Unlimited bases",
+                "Unlimited tables",
+                "Custom TTLs",
+                "TypeScript definition generation",
+                "API protection",
+                "Image CDN",
             ],
-            link: "https://airproxy.lemonsqueezy.com/checkout/buy/61a1ef0c-65a3-453b-aaf8-97aff3af1712?embed=1",
             mostPopular: false,
         },
         {
@@ -144,16 +147,15 @@ const pricing = {
             description:
                 "A plan that scales with your rapidly growing business.",
             features: [
-                "Unlimited bases",
-                "Unlimited tables",
                 "Up to 7.5k unique users",
                 "Up to 1M requests / month",
+                "Unlimited bases",
+                "Unlimited tables",
                 "Custom TTLs",
                 "TypeScript definition generation",
                 "API protection",
                 "Image CDN",
             ],
-            link: "https://airproxy.lemonsqueezy.com/checkout/buy/a8b9d123-0dda-4869-ac1d-689d33e43d3b?embed=1",
             mostPopular: true,
         },
         {
@@ -163,10 +165,10 @@ const pricing = {
             description:
                 "Dedicated support and infrastructure for your company.",
             features: [
-                "Unlimited bases",
-                "Unlimited tables",
                 "Up to 40K unique users",
                 "Up to 100M requests / month",
+                "Unlimited bases",
+                "Unlimited tables",
                 "Custom TTLs",
                 "TypeScript definition generation",
                 "API protection",
@@ -174,7 +176,6 @@ const pricing = {
                 "99.99% uptime SLA",
                 "Priority support",
             ],
-            link: "https://airproxy.lemonsqueezy.com/checkout/buy/020e0597-77f7-4336-8fd7-fbeaf08768ae?embed=1",
             mostPopular: false,
         },
     ],
@@ -691,31 +692,16 @@ export default function Welcome(props) {
                                 </ul>
                             </div>
 
-                            {/* {session.status === "authenticated" ? (
-                                <a
-                                    href={`${tier.link}&checkout[custom][user_id]=${session.data.user?.id}&checkout[email]=${session.data.user?.email}&checkout[discount_code]=EARLYBIRD`}
-                                    className={classNames(
-                                        tier.mostPopular
-                                            ? "bg-[#544CE6] text-white hover:bg-[#544CE6]"
-                                            : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
-                                        "lemonsqueezy-button mt-8 block w-full rounded-md border border-transparent py-3 px-6 text-center font-medium"
-                                    )}
-                                >
-                                    Get Started
-                                </a>
-                            ) : (
-                                <button
-                                    onClick={() => signIn("auth0")}
-                                    className={classNames(
-                                        tier.mostPopular
-                                            ? "bg-[#544CE6] text-white hover:bg-[#544CE6]"
-                                            : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100",
-                                        "mt-8 block w-full rounded-md border border-transparent py-3 px-6 text-center font-medium"
-                                    )}
-                                >
-                                    Get Started
-                                </button>
-                            )} */}
+                            <a
+                                href="/billing"
+                                className={`mt-8 block w-full rounded-md border border-transparent py-3 px-6 text-center font-medium ${
+                                    tier.mostPopular
+                                        ? "bg-[#544CE6] text-white hover:bg-[#544CE6]"
+                                        : "bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
+                                }`}
+                            >
+                                Get Started
+                            </a>
                         </div>
                     ))}
                 </div>
