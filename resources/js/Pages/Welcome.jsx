@@ -30,7 +30,7 @@ const navigation = [
     { name: "Features", href: "/#features" },
     { name: "Pricing", href: "/#pricing" },
     { name: "Blog", href: "/blog" },
-    { name: "Docs", href: "https://docs.airproxy.app" },
+    { name: "Docs", href: "https://docs.airproxy.app", external: true },
 ];
 
 const features = [
@@ -255,15 +255,25 @@ export default function Welcome(props) {
                                 </button>
                             </div>
                             <div className="hidden lg:flex lg:min-w-0 lg:flex-1 lg:justify-center lg:gap-x-12">
-                                {navigation.map((item) => (
-                                    <Link
-                                        key={item.name}
-                                        href={item.href}
-                                        className="font-semibold text-gray-900 hover:text-gray-900"
-                                    >
-                                        {item.name}
-                                    </Link>
-                                ))}
+                                {navigation.map((item) =>
+                                    item.external ? (
+                                        <a
+                                            key={item.name}
+                                            href={item.href}
+                                            className="font-semibold text-gray-900 hover:text-gray-900"
+                                        >
+                                            {item.name}
+                                        </a>
+                                    ) : (
+                                        <Link
+                                            key={item.name}
+                                            href={item.href}
+                                            className="font-semibold text-gray-900 hover:text-gray-900"
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    )
+                                )}
                             </div>
                             <div className="hidden lg:flex lg:min-w-0 lg:flex-1 lg:justify-end space-x-3">
                                 {props.auth.user ? (

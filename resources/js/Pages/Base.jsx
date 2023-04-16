@@ -148,7 +148,7 @@ export default function Dashboard({ auth, errors, base, stats, requests }) {
                                     <Text>
                                         Read how to use it{" "}
                                         <a
-                                            href="https://blog.airproxy.app/fetching-data/accessing-your-data#protection"
+                                            href="https://docs.airproxy.app/fetching-data/accessing-your-data#protection"
                                             target="_blank"
                                             className="text-indigo-600 hover:text-indigo-500"
                                         >

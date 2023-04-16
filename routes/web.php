@@ -23,8 +23,6 @@ use Inertia\Inertia;
 
 Route::inertia('/', 'Welcome');
 
-Route::get('/blog', fn () => view('blog.index'));
-
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $user_id = auth()->user()->id;
