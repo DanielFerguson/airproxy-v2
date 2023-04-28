@@ -17,6 +17,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-auth.jsonrr
 .rr.yaml
 rr
