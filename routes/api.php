@@ -21,6 +21,13 @@ use Illuminate\Support\Facades\Storage;
 
 Route::prefix('v1')->group(function () {
     Route::get('/asset/{asset_id}/{name}', function ($asset_id, $name) {
+        // Check that the asset exists
+        if (!Storage::exists("app/$asset_id-$name")) {
+            return response()->json([
+                'error' => 'The asset does not exist',
+            ], 404);
+        }
+
         return Storage::download("app/$asset_id-$name");
     });
 
