@@ -29,7 +29,11 @@ class HorizonServiceProvider extends HorizonApplicationServiceProvider
      */
     protected function gate(): void
     {
-        Gate::define('viewHorizon', function ($user) {
+        Gate::define('viewHorizon', function ($user = null) {
+            if (empty($user)) {
+                return request()->bearerToken() === config('services.horizon.secret');
+            }
+
             return in_array($user->email, [
                 'dan@thecashkings.com.au',
                 'gday@danferg.com'
