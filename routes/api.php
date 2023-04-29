@@ -29,7 +29,7 @@ Route::prefix('v1')->group(function () {
         }
 
         return Storage::download("$asset_id-$name");
-    });
+    })->middleware('throttle:500,1');
 
     Route::get('/data/{user_uuid}/{base_id}/{table_id}', function (Request $request, string $user_uuid, string $base_id, string $table_id) {
         $view = $request->query('view', null);
