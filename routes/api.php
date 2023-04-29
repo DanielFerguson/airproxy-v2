@@ -20,8 +20,8 @@ use Illuminate\Support\Facades\Storage;
 */
 
 Route::prefix('v1')->group(function () {
-    Route::get('/asset/{asset_id}', function ($asset_id) {
-        return Storage::download($asset_id);
+    Route::get('/asset/{asset_id}/{name}', function ($asset_id, $name) {
+        return Storage::download("app/$asset_id-$name");
     });
 
     Route::get('/data/{user_uuid}/{base_id}/{table_id}', function (Request $request, string $user_uuid, string $base_id, string $table_id) {
