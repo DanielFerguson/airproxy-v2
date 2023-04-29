@@ -21,6 +21,8 @@ class Kernel extends ConsoleKernel
         })->hourly();
 
         $schedule->command('cache:prune-stale-tags')->hourly();
+
+        $schedule->command('horizon:snapshot')->everyFiveMinutes();
     }
 
     /**
