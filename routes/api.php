@@ -29,7 +29,7 @@ Route::prefix('v1')->group(function () {
         }
 
         return Storage::download("$asset_id-$name");
-    })->middleware('throttle:500,1');
+    })->middleware('throttle:2500,1');
 
     Route::get('/data/{user_uuid}/{base_id}/{table_id}', function (Request $request, string $user_uuid, string $base_id, string $table_id) {
         $view = $request->query('view', null);
@@ -135,7 +135,7 @@ Route::prefix('v1')->group(function () {
         );
 
         return response()->json($data);
-    })->middleware('gzipped');
+    })->middleware(['gzipped', 'throttle:500,1']);
 
     Route::delete('/data/{user_uuid}/{base_id}/{table_id}', function (Request $request, string $user_uuid, string $base_id, string $table_id) {
         $view = $request->query('view', null);
@@ -217,5 +217,5 @@ Route::prefix('v1')->group(function () {
         return response()->json([
             'success' => true,
         ]);
-    })->middleware('gzipped');
+    })->middleware('gzipped', 'throttle:100,1');
 });
