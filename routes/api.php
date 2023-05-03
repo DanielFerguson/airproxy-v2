@@ -20,17 +20,6 @@ use Illuminate\Support\Facades\Storage;
 */
 
 Route::prefix('v1')->group(function () {
-    Route::get('/asset/{asset_id}/{name}', function ($asset_id, $name) {
-        // Check that the asset exists
-        if (!Storage::exists("$asset_id-$name")) {
-            return response()->json([
-                'error' => 'The asset does not exist',
-            ], 404);
-        }
-
-        return Storage::download("$asset_id-$name");
-    })->middleware('throttle:2500,1');
-
     Route::get('/data/{user_uuid}/{base_id}/{table_id}', function (Request $request, string $user_uuid, string $base_id, string $table_id) {
         $view = $request->query('view', null);
         $per_page = $request->query('perPage', '100');
@@ -130,6 +119,7 @@ Route::prefix('v1')->group(function () {
         // Fire off a job to fetch and cache all of the static files
         CacheStaticFiles::dispatchAfterResponse(
             data: $data,
+            user_uuid: $user_uuid,
             base_id: $base_id,
             table_id: $table_id,
         );

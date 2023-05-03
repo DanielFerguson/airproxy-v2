@@ -25,7 +25,6 @@ class AppServiceProvider extends ServiceProvider
         }
 
         Relation::enforceMorphMap([
-            'asset' => 'App\Models\Asset',
             'table' => 'App\Models\Table',
         ]);
     }

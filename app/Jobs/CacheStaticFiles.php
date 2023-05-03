@@ -3,12 +3,10 @@
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Cache;
 
 class CacheStaticFiles implements ShouldQueue
 {
@@ -19,6 +17,7 @@ class CacheStaticFiles implements ShouldQueue
      */
     public function __construct(
         private readonly array $data,
+        private readonly string $user_uuid,
         private readonly string $base_id,
         private readonly string $table_id,
     ) {
@@ -50,6 +49,7 @@ class CacheStaticFiles implements ShouldQueue
                         id: $v->id,
                         filename: $v->filename,
                         size: $v->size,
+                        user_uuid: $this->user_uuid,
                         base_id: $this->base_id,
                         table_id: $this->table_id,
                     );

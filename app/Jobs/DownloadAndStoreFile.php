@@ -2,9 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\Asset;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -25,10 +23,11 @@ class DownloadAndStoreFile implements ShouldQueue
         private readonly string $id,
         private readonly string $filename,
         private readonly int $size,
+        private readonly string $user_uuid,
         private readonly string $base_id,
         private readonly string $table_id,
     ) {
-        $this->path = "$id-$filename";
+        $this->path = "$user_uuid/$id-$filename"; // e.g. 1234/1234-foo.png
     }
 
     /**
@@ -49,20 +48,7 @@ class DownloadAndStoreFile implements ShouldQueue
             return;
         }
 
+        // Store the file
         Storage::put($this->path, $file);
-
-        // Store the file metadata
-        Asset::updateOrCreate(
-            [
-                'id' => $this->id,
-            ],
-            [
-                'filename' => $this->filename,
-                'size' => $this->size,
-                'path' => $this->path,
-                'base_id' => $this->base_id,
-                'table_id' => $this->table_id,
-            ]
-        );
     }
 }
