@@ -29,7 +29,7 @@ function isDiscountPeriod() {
 const navigation = [
     { name: "Features", href: "/#features" },
     { name: "Pricing", href: "/#pricing" },
-    { name: "Blog", href: "/blog" },
+    { name: "Blog", href: "https://blog.airproxy.app", external: true },
     { name: "Docs", href: "https://docs.airproxy.app", external: true },
 ];
 
@@ -387,7 +387,7 @@ export default function Welcome(props) {
                                             Announcing the public launch of
                                             Airproxy.{" "}
                                             <Link
-                                                href="/blog/announcing-airproxy"
+                                                href="https://blog.airproxy.app/announcing-airproxy"
                                                 className="font-semibold text-[#544CE6]"
                                             >
                                                 <span

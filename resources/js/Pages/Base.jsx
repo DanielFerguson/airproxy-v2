@@ -1,7 +1,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Head, Link, router } from "@inertiajs/react";
 import millify from "millify";
-import { PauseIcon, PlayIcon } from "@heroicons/react/20/solid";
+import { CalculatorIcon, PauseIcon, PlayIcon } from "@heroicons/react/20/solid";
 import {
     ShareIcon,
     SignalIcon,
@@ -25,6 +25,8 @@ import {
     Badge,
     AreaChart,
     Col,
+    SelectBox,
+    SelectBoxItem,
 } from "@tremor/react";
 import { useEffect } from "react";
 
@@ -241,7 +243,74 @@ export default function Dashboard({ auth, errors, base, stats, requests }) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>
-                                        <Text>Coming Soon</Text>
+                                        <div>
+                                            <SelectBox
+                                                className="overflow-visible"
+                                                onValueChange={(value) => {
+                                                    axios
+                                                        .post(
+                                                            route(
+                                                                "table.update-ttl",
+                                                                table.id
+                                                            ),
+                                                            {
+                                                                ttl: value,
+                                                            }
+                                                        )
+                                                        .then(() => {
+                                                            toast.success(
+                                                                "Updated TTL"
+                                                            );
+                                                        });
+                                                }}
+                                                defaultValue={table.ttl}
+                                            >
+                                                <SelectBoxItem
+                                                    value={60}
+                                                    text="1 minute"
+                                                />
+                                                <SelectBoxItem
+                                                    value={300}
+                                                    text="5 minutes"
+                                                />
+                                                <SelectBoxItem
+                                                    value={600}
+                                                    text="10 minutes"
+                                                />
+                                                <SelectBoxItem
+                                                    value={900}
+                                                    text="15 minutes"
+                                                />
+                                                <SelectBoxItem
+                                                    value={1800}
+                                                    text="30 minutes"
+                                                />
+                                                <SelectBoxItem
+                                                    value={3600}
+                                                    text="1 hour"
+                                                />
+                                                <SelectBoxItem
+                                                    value={14400}
+                                                    text="4 hours"
+                                                />
+                                                <SelectBoxItem
+                                                    value={43200}
+                                                    text="12 hours"
+                                                />
+                                                <SelectBoxItem
+                                                    value={86400}
+                                                    text="1 days"
+                                                />
+                                                <SelectBoxItem
+                                                    value={259200}
+                                                    text="3 days"
+                                                />
+                                                <SelectBoxItem
+                                                    value={604800}
+                                                    text="1 week"
+                                                />
+                                            </SelectBox>
+                                        </div>
                                     </TableCell>
                                     <TableCell>
                                         <Flex className="justify-end space-x-3">

@@ -133,6 +133,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::controller(TableController::class)->group(function () {
         Route::post('/tables/{table}/toggle', 'toggle')->name('table.toggle');
+        Route::post('/tables/{table}/ttl', 'updateTtl')->name('table.update-ttl');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

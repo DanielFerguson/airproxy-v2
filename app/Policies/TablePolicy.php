@@ -15,4 +15,12 @@ class TablePolicy
     {
         return $user->id === $table->base->user_id;
     }
+
+    /**
+     * Determine whether the user can update the ttl.
+     */
+    public function updateTtl(User $user, Table $table): bool
+    {
+        return $user->id === $table->base->user_id;
+    }
 }
