@@ -48,14 +48,24 @@ class AirtableController extends Controller
         return $response->json()['tables'];
     }
 
-    public function getRecords(string $base_id, string $table_id, string|null $view_id = null, int $per_page = 100, string|null $filter = null): array
+    public function getRecords(string $base_id, string $table_id, string|null $view_id = null, int $per_page = 100, string|null $filter = null, string|null $fields = null): array
     {
+        // Split the fields into an array
+        $fields = $fields ? explode(',', $fields) : null;
+
+        // Set the params
         $params = [
             "maxRecords" => 100,
             "pageSize" => $per_page,
-            "view" => $view_id
+            "view" => $view_id,
         ];
 
+        // If fields are specified, add them to the params
+        if ($fields) {
+            $params['fields'] = $fields;
+        }
+
+        // If a filter is specified, add it to the params
         if ($filter) {
             $params['filterByFormula'] = $filter;
         }

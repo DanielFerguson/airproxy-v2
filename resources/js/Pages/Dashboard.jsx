@@ -28,6 +28,7 @@ import {
     AreaChart,
     TextInput,
     Button,
+    Col,
 } from "@tremor/react";
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
@@ -277,6 +278,41 @@ export default function Dashboard({
                         </Flex>
                     </Card>
                 </Grid>
+
+                {/* Account Details */}
+                <Card className="mt-6">
+                    <Title>User ID</Title>
+                    <Grid numCols={2}>
+                        <Col className="grid items-center">
+                            <Text>{auth.user.uuid}</Text>
+                        </Col>
+                        <Col className="flex justify-end">
+                            <Button
+                                size="sm"
+                                color="indigo"
+                                importance="secondary"
+                                onClick={() => {
+                                    if (!navigator.clipboard) {
+                                        toast.error(
+                                            "Your browser does not support copying to clipboard."
+                                        );
+                                        return;
+                                    }
+
+                                    navigator.clipboard.writeText(
+                                        auth.user.uuid
+                                    );
+                                    toast.success(
+                                        "Copied user ID to your clipboard."
+                                    );
+                                }}
+                            >
+                                Copy ID
+                            </Button>
+                        </Col>
+                    </Grid>
+                </Card>
+
                 {/* Requests Charts */}
                 <Card className="mt-6">
                     <Title>Requests</Title>
@@ -291,6 +327,7 @@ export default function Dashboard({
                         colors={["indigo"]}
                     />
                 </Card>
+
                 {/* Bases */}
                 <Card className="mt-6">
                     <Title>Bases</Title>

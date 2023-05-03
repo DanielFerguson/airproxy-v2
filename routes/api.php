@@ -24,6 +24,7 @@ Route::prefix('v1')->group(function () {
         $view = $request->query('view', null);
         $per_page = $request->query('perPage', '100');
         $filter = $request->query('filter', null);
+        $fields = $request->query('fields', null);
 
         $cache = Cache::tags(["uuid:$user_uuid", "base:$base_id", "table:$table_id", "view:$view"]);
 
@@ -102,7 +103,7 @@ Route::prefix('v1')->group(function () {
             ], 401);
         }
 
-        $cache_key = "data-per_page:$per_page:filter:$filter";
+        $cache_key = "data-per_page:$per_page:filter:$filter:fields:$fields";
 
         // If the data exists in the cache, return it
         if ($cache->has($cache_key)) {
@@ -111,7 +112,7 @@ Route::prefix('v1')->group(function () {
 
         // Fetch the data from Airtable
         $airtable = new AirtableController($token);
-        $data = $airtable->getRecords($base_id, $table_id, $view, $per_page, $filter);
+        $data = $airtable->getRecords($base_id, $table_id, $view, $per_page, $filter, $fields);
 
         // Cache the data for the base's TTL
         $cache->put($cache_key, $data, now()->addSeconds($ttl));
