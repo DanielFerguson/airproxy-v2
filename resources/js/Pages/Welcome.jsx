@@ -70,10 +70,10 @@ const features = [
         comingSoon: false,
     },
     {
-        name: "Bring Your Team",
+        name: "Webhooks",
         description:
-            "Share schemas with your developers, generate test data, and get TypeScript types to build your UIs safely.",
-        icon: UsersIcon,
+            "Leave TTLs in the past; we'll update the cache in realtime so that your clients always have the latest data.",
+        icon: SignalIcon,
         comingSoon: "Q2 2023",
     },
     {
@@ -84,31 +84,10 @@ const features = [
         comingSoon: "Q2 2023",
     },
     {
-        name: "Private CDNs",
-        description:
-            "Protect your static assets with private CDNs, secured with API keys.",
-        icon: LockClosedIcon,
-        comingSoon: "Q2 2023",
-    },
-    {
         name: "Image Optimisations",
         description:
             "Compress, resize, and optimise your images on the fly with our CDN.",
         icon: PhotoIcon,
-        comingSoon: "Q2 2023",
-    },
-    {
-        name: "Dark Mode",
-        description:
-            "Doing some late night coding? No longer will you need to burn out your retinas.",
-        icon: MoonIcon,
-        comingSoon: "Q3 2023",
-    },
-    {
-        name: "Webhooks",
-        description:
-            "Get notified when your data changes with webhooks, and power your user interfaces in real time.",
-        icon: SignalIcon,
         comingSoon: "Q3 2023",
     },
     {
@@ -116,7 +95,7 @@ const features = [
         description:
             "Move faster with type-safe APIs that are generated from your Airtable schemas.",
         icon: ShieldCheckIcon,
-        comingSoon: "Q4 2023",
+        comingSoon: "Coming Soon",
     },
 ];
 
