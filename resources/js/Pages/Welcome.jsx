@@ -81,7 +81,7 @@ const features = [
         description:
             "Generate TypeScript types and interfaces from your Airtable schemas.",
         icon: BeakerIcon,
-        comingSoon: "Q2 2023",
+        comingSoon: "Q3 2023",
     },
     {
         name: "Image Optimisations",
